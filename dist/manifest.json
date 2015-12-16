@@ -3,7 +3,7 @@
     "manifest_version": 2,
 
     "name": "petit_deco_github",
-    "description": "petit decoration for github.",
+    "description": "petit decoration chrome extension on github.",
 
     "content_scripts": [
         {
