@@ -9,7 +9,9 @@ $(function() {
     NAVIGATION_ITEM: '.js-navigation-item'
   };
   PlusOne = (function() {
-    PlusOne.prototype.selector = 'js-petit-deco-insert-plus-one';
+    PlusOne.prototype.selectors = {
+      starter: '.js-petit-deco-insert-plus-one'
+    };
 
     function PlusOne() {
       this.insertIcon();
@@ -22,7 +24,7 @@ $(function() {
         "class": 'octicon octicon-thumbsup'
       });
       $new_tab = $('<div/>').attr({
-        "class": 'tabnav-tab ' + this.selector,
+        "class": 'tabnav-tab ' + this.selectors['starter'].replace(/\./, ''),
         style: 'cursor: pointer;'
       }).append($icon_node);
       return $(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).each(function() {
@@ -31,7 +33,7 @@ $(function() {
     };
 
     PlusOne.prototype.bindEvents = function() {
-      return $('body').on('click', '.' + this.selector, function(e) {
+      return $('body').on('click', this.selectors['starter'], function(e) {
         var $comment_field, $current_form;
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
@@ -44,17 +46,132 @@ $(function() {
 
   })();
   LGTMImageSelection = (function() {
+    LGTMImageSelection.prototype.selectors = {
+      starter: '.js-petit-deco-insert-lgtm-selection-panel',
+      backdrop: '.js-petit-deco-lgtm-selection-panel-backdrop',
+      panel: '.js-petit-deco-lgtm-selection-panel',
+      lgtm_image: '.js-petit-deco-lgtm-image'
+    };
+
     function LGTMImageSelection() {
-      this.insertSelectionPanel();
-      this.insertIcon();
-      this.bindEvents();
+      this.fetchLGTMImage = bind(this.fetchLGTMImage, this);
+      this.bindEvents = bind(this.bindEvents, this);
+      this.insertIcon = bind(this.insertIcon, this);
+      this.insertLGTMSelectionPanel = bind(this.insertLGTMSelectionPanel, this);
+      this.insertLGTMSelectionPanelBackdrop = bind(this.insertLGTMSelectionPanelBackdrop, this);
+      this.deferred = new $.Deferred;
+      this.insertLGTMSelectionPanelBackdrop();
+      this.deferred.promise().then(this.insertLGTMSelectionPanel);
+      this.deferred.promise().then(this.insertIcon);
+      this.deferred.promise().then(this.bindEvents);
     }
 
-    LGTMImageSelection.prototype.insertSelectionPanel = function() {};
+    LGTMImageSelection.prototype.insertLGTMSelectionPanelBackdrop = function() {
+      var $lgtm_selection_panel_backdrop_node;
+      $lgtm_selection_panel_backdrop_node = $('<div/>').attr({
+        "class": this.selectors['backdrop'].replace(/\./, ''),
+        style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
+      });
+      $lgtm_selection_panel_backdrop_node.appendTo('body');
+      return this.deferred.resolve();
+    };
 
-    LGTMImageSelection.prototype.insertIcon = function() {};
+    LGTMImageSelection.prototype.insertLGTMSelectionPanel = function() {
+      var $lgtm_selection_panel_node, $lgtm_selection_panel_triangle_node;
+      $lgtm_selection_panel_node = $('<div/>').attr({
+        "class": this.selectors['panel'].replace(/\./, '')
+      });
+      $lgtm_selection_panel_node.css({
+        display: 'none',
+        zIndex: '200',
+        position: 'absolute',
+        width: '640px',
+        height: '220px',
+        background: '#333',
+        borderRadius: '3px',
+        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.075)'
+      });
+      $lgtm_selection_panel_node.append($('<img/>').attr({
+        "class": this.selectors['lgtm_image'].replace(/\./, ''),
+        style: 'margin: 10px 0 10px 10px;',
+        width: 200,
+        height: 200
+      }));
+      $lgtm_selection_panel_node.append($('<img/>').attr({
+        "class": this.selectors['lgtm_image'].replace(/\./, ''),
+        style: 'margin: 10px;',
+        width: 200,
+        height: 200
+      }));
+      $lgtm_selection_panel_node.append($('<img/>').attr({
+        "class": this.selectors['lgtm_image'].replace(/\./, ''),
+        style: 'margin: 10px 10px 10px 0px;',
+        width: 200,
+        height: 200
+      }));
+      $lgtm_selection_panel_triangle_node = $('<div/>').css({
+        position: 'absolute',
+        bottom: '-10px',
+        left: '33%',
+        marginLeft: '-10px',
+        width: '0',
+        height: '0',
+        borderTop: '10px solid #333',
+        borderLeft: '10px solid transparent',
+        borderRight: '10px solid transparent'
+      });
+      $lgtm_selection_panel_node.append($lgtm_selection_panel_triangle_node);
+      $lgtm_selection_panel_node.appendTo('body');
+      return this.deferred.resolve();
+    };
 
-    LGTMImageSelection.prototype.bindEvents = function() {};
+    LGTMImageSelection.prototype.insertIcon = function() {
+      var $icon_node, $new_tab;
+      $icon_node = $('<span/>').attr({
+        "class": 'octicon octicon-mortar-board'
+      });
+      $new_tab = $('<div/>').attr({
+        "class": 'tabnav-tab ' + this.selectors['starter'].replace(/\./, ''),
+        style: 'cursor: pointer;'
+      }).append($icon_node);
+      $(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).each(function() {
+        return $(this).find('.tabnav-tabs').append($new_tab.clone());
+      });
+      return this.deferred.resolve();
+    };
+
+    LGTMImageSelection.prototype.bindEvents = function() {
+      var $current_form;
+      $current_form = null;
+      $('body').on('click', this.selectors['starter'], (function(_this) {
+        return function(e) {
+          var $comment_field, $lgtm_images, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
+          $self = $(e.currentTarget);
+          $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
+          $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
+          $lgtm_selection_panel_backdrop_node = $(_this.selectors['backdrop']);
+          $lgtm_selection_panel_node = $(_this.selectors['panel']);
+          $lgtm_selection_panel_node.css('top', $self.offset().top - 220);
+          $lgtm_selection_panel_node.css('left', $comment_field.offset().left);
+          $lgtm_images = $lgtm_selection_panel_node.find(_this.selectors['lgtm_image']);
+          $lgtm_images.each(function(_i, element) {
+            return _this.fetchLGTMImage($(element));
+          });
+          $lgtm_selection_panel_backdrop_node.show();
+          return $lgtm_selection_panel_node.show();
+        };
+      })(this));
+      return $('body').on('click', this.selectors['backdrop'], (function(_this) {
+        return function(e) {
+          var $emoji_pallet_node;
+          $(e.target).hide();
+          $emoji_pallet_node = $(_this.selectors['panel']);
+          return $emoji_pallet_node.hide();
+        };
+      })(this));
+    };
+
+    LGTMImageSelection.prototype.fetchLGTMImage = function($img_node) {};
 
     return LGTMImageSelection;
 
@@ -95,6 +212,7 @@ $(function() {
           $emoji_suggestion = $(suggestions).filter(COMMON_SELECTORS.EMOJI_SUGGESTIONS).show();
           $emoji_suggestion.appendTo('body');
           $(_this.selectors['pallet']).css({
+            display: 'none',
             position: 'absolute',
             zIndex: '200',
             width: '670px',
