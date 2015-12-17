@@ -31,9 +31,11 @@ $ ->
       $('body').on 'click', '.' + @selector, (e) ->
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
 
-        current_comment = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val()
+        $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
-        $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_comment + ' :+1:')
+        $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:')
+
+        $comment_field.focus()
 
 
   class LGTMImageSelection

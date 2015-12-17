@@ -32,10 +32,11 @@ $(function() {
 
     PlusOne.prototype.bindEvents = function() {
       return $('body').on('click', '.' + this.selector, function(e) {
-        var $current_form, current_comment;
+        var $comment_field, $current_form;
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
-        current_comment = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val();
-        return $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_comment + ' :+1:');
+        $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
+        $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:');
+        return $comment_field.focus();
       });
     };
 
