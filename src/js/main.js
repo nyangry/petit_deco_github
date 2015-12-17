@@ -112,7 +112,7 @@ $(function() {
       $lgtm_selection_panel_triangle_node = $('<div/>').css({
         position: 'absolute',
         bottom: '-10px',
-        left: '33%',
+        left: '32%',
         marginLeft: '-10px',
         width: '0',
         height: '0',
