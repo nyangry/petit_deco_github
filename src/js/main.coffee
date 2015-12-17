@@ -2,6 +2,8 @@ $ ->
   COMMON_SELECTORS =
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form'
     COMMENT_FIELD: '.js-comment-field'
+    EMOJI_SUGGESTIONS: '.emoji-suggestions'
+    NAVIGATION_ITEM: '.js-navigation-item'
 
 
   class PlusOne
@@ -29,9 +31,9 @@ $ ->
       $('body').on 'click', '.' + @selector, (e) ->
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
 
-        current_text = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val()
+        current_comment = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val()
 
-        $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_text + ' :+1:')
+        $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_comment + ' :+1:')
 
 
   class LGTMImageSelection
@@ -63,16 +65,27 @@ $ ->
 
     insertEmojiPalletBackdrop: =>
       $emoji_pallet_backdrop_node = $('<div/>').attr
-        class: @selectors['backdrop']
+        class: @selectors['backdrop'].replace(/\./, '')
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
 
-      $emoji_pallet_backdrop_node.appendTo 'body'
+      $emoji_pallet_backdrop_node.appendTo('body')
 
       @deferred.resolve()
 
     fetchSuggestions: =>
       $.ajax($('.js-suggester').first().data('url')).done (suggestions) =>
-        $(suggestions).appendTo(@selectors['backdrop'])
+        $emoji_suggestion = $(suggestions).filter(COMMON_SELECTORS.EMOJI_SUGGESTIONS).show()
+        $emoji_suggestion.appendTo('body')
+
+        $(@selectors['pallet']).css(
+          position: 'absolute'
+          zIndex: '200'
+          width: '670px'
+          fontSize: '0px'
+          background: '#f7f7f7'
+          height: '200px'
+          overflow: 'scroll'
+        )
 
         $(@selectors['pallet']).find('li').each ->
           $span = $(@).find('span')
@@ -101,46 +114,48 @@ $ ->
       @deferred.resolve()
 
     bindEvents: =>
-      $('body').on 'click', '.' + @selectors['starter'], (e) ->
-        $self = $(@)
+      $current_form = null
+
+      $('body').on 'click', @selectors['starter'], (e) =>
+        $self = $(e.target)
+
+        $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
+        $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
         $emoji_pallet_backdrop_node = $(@selectors['backdrop'])
         $emoji_pallet_backdrop_node.show()
 
         $emoji_pallet_node = $(@selectors['pallet'])
+        $emoji_pallet_node.css 'top', $comment_field.offset().top
+        $emoji_pallet_node.css 'left', $comment_field.offset().left
         $emoji_pallet_node.show()
-        $emoji_pallet_node.css 'top', $self.offset().top + 42
-        # $emoji_pallet_node.css 'left', $self.offset().left + 18
-        $emoji_pallet_node.css 'left', '25%'
 
-        # 現在開いているコメント欄を保存しておく
-        $current_form = $(@).parents('form')
 
       # 絵文字パレット以外の領域クリックでパレットを閉じる
-      $('body').on 'click', @selectors['backdrop'], (e) ->
-        $(@).hide()
-        $emoji_pallet_node = $('.js-pallet')
+      $('body').on 'click', @selectors['backdrop'], (e) =>
+        $(e.target).hide()
+
+        $emoji_pallet_node = $(@selectors['pallet'])
         $emoji_pallet_node.hide()
 
       # 絵文字を選択する
-      $('body').on 'click', '.js-pallet-icon', (e) ->
-        $text_area = $current_form.find('.js-note-text')
+      $('body').on 'click', COMMON_SELECTORS.NAVIGATION_ITEM, (e) =>
+        $self = $(e.currentTarget)
+
+        $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
         # 絵文字タグを挿入する
-        $text_area.val $text_area.val() + ' ' + $(@).data 'emoji'
-
-        # コメント追加ボタンのdisabledを解除する
-        $current_form.find('.js-comment-button').removeClass('disabled').removeAttr('disabled')
+        $comment_field.val $comment_field.val() + ' ' + $self.data('value')
 
         # パレットを閉じる
-        $emoji_pallet_backdrop_node = $('.js-pallet-backdrop')
+        $emoji_pallet_backdrop_node = $(@selectors['backdrop'])
         $emoji_pallet_backdrop_node.hide()
 
-        $emoji_pallet_node = $('.js-pallet')
+        $emoji_pallet_node = $(@selectors['pallet'])
         $emoji_pallet_node.hide()
 
         # テキストエリアにフォーカスする
-        $text_area.focus()
+        $comment_field.focus()
 
       @deferred.resolve()
 

@@ -4,7 +4,9 @@ $(function() {
   var COMMON_SELECTORS, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
   COMMON_SELECTORS = {
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form',
-    COMMENT_FIELD: '.js-comment-field'
+    COMMENT_FIELD: '.js-comment-field',
+    EMOJI_SUGGESTIONS: '.emoji-suggestions',
+    NAVIGATION_ITEM: '.js-navigation-item'
   };
   PlusOne = (function() {
     PlusOne.prototype.selector = 'js-petit-deco-insert-plus-one';
@@ -30,10 +32,10 @@ $(function() {
 
     PlusOne.prototype.bindEvents = function() {
       return $('body').on('click', '.' + this.selector, function(e) {
-        var $current_form, current_text;
+        var $current_form, current_comment;
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
-        current_text = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val();
-        return $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_text + ' :+1:');
+        current_comment = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val();
+        return $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val(current_comment + ' :+1:');
       });
     };
 
@@ -78,7 +80,7 @@ $(function() {
     EmojiPallet.prototype.insertEmojiPalletBackdrop = function() {
       var $emoji_pallet_backdrop_node;
       $emoji_pallet_backdrop_node = $('<div/>').attr({
-        "class": this.selectors['backdrop'],
+        "class": this.selectors['backdrop'].replace(/\./, ''),
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
       });
       $emoji_pallet_backdrop_node.appendTo('body');
@@ -88,7 +90,18 @@ $(function() {
     EmojiPallet.prototype.fetchSuggestions = function() {
       return $.ajax($('.js-suggester').first().data('url')).done((function(_this) {
         return function(suggestions) {
-          $(suggestions).appendTo(_this.selectors['backdrop']);
+          var $emoji_suggestion;
+          $emoji_suggestion = $(suggestions).filter(COMMON_SELECTORS.EMOJI_SUGGESTIONS).show();
+          $emoji_suggestion.appendTo('body');
+          $(_this.selectors['pallet']).css({
+            position: 'absolute',
+            zIndex: '200',
+            width: '670px',
+            fontSize: '0px',
+            background: '#f7f7f7',
+            height: '200px',
+            overflow: 'scroll'
+          });
           $(_this.selectors['pallet']).find('li').each(function() {
             var $span;
             $span = $(this).find('span');
@@ -118,34 +131,43 @@ $(function() {
     };
 
     EmojiPallet.prototype.bindEvents = function() {
-      $('body').on('click', '.' + this.selectors['starter'], function(e) {
-        var $current_form, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
-        $self = $(this);
-        $emoji_pallet_backdrop_node = $(this.selectors['backdrop']);
-        $emoji_pallet_backdrop_node.show();
-        $emoji_pallet_node = $(this.selectors['pallet']);
-        $emoji_pallet_node.show();
-        $emoji_pallet_node.css('top', $self.offset().top + 42);
-        $emoji_pallet_node.css('left', '25%');
-        return $current_form = $(this).parents('form');
-      });
-      $('body').on('click', this.selectors['backdrop'], function(e) {
-        var $emoji_pallet_node;
-        $(this).hide();
-        $emoji_pallet_node = $('.js-pallet');
-        return $emoji_pallet_node.hide();
-      });
-      $('body').on('click', '.js-pallet-icon', function(e) {
-        var $emoji_pallet_backdrop_node, $emoji_pallet_node, $text_area;
-        $text_area = $current_form.find('.js-note-text');
-        $text_area.val($text_area.val() + ' ' + $(this).data('emoji'));
-        $current_form.find('.js-comment-button').removeClass('disabled').removeAttr('disabled');
-        $emoji_pallet_backdrop_node = $('.js-pallet-backdrop');
-        $emoji_pallet_backdrop_node.hide();
-        $emoji_pallet_node = $('.js-pallet');
-        $emoji_pallet_node.hide();
-        return $text_area.focus();
-      });
+      var $current_form;
+      $current_form = null;
+      $('body').on('click', this.selectors['starter'], (function(_this) {
+        return function(e) {
+          var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
+          $self = $(e.target);
+          $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
+          $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
+          $emoji_pallet_backdrop_node = $(_this.selectors['backdrop']);
+          $emoji_pallet_backdrop_node.show();
+          $emoji_pallet_node = $(_this.selectors['pallet']);
+          $emoji_pallet_node.css('top', $comment_field.offset().top);
+          $emoji_pallet_node.css('left', $comment_field.offset().left);
+          return $emoji_pallet_node.show();
+        };
+      })(this));
+      $('body').on('click', this.selectors['backdrop'], (function(_this) {
+        return function(e) {
+          var $emoji_pallet_node;
+          $(e.target).hide();
+          $emoji_pallet_node = $(_this.selectors['pallet']);
+          return $emoji_pallet_node.hide();
+        };
+      })(this));
+      $('body').on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
+        return function(e) {
+          var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
+          $self = $(e.currentTarget);
+          $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
+          $comment_field.val($comment_field.val() + ' ' + $self.data('value'));
+          $emoji_pallet_backdrop_node = $(_this.selectors['backdrop']);
+          $emoji_pallet_backdrop_node.hide();
+          $emoji_pallet_node = $(_this.selectors['pallet']);
+          $emoji_pallet_node.hide();
+          return $comment_field.focus();
+        };
+      })(this));
       return this.deferred.resolve();
     };
 
