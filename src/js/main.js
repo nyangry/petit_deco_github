@@ -54,7 +54,6 @@ $(function() {
     };
 
     function LGTMImageSelection() {
-      this.fetchLGTMImage = bind(this.fetchLGTMImage, this);
       this.bindEvents = bind(this.bindEvents, this);
       this.insertIcon = bind(this.insertIcon, this);
       this.insertLGTMSelectionPanel = bind(this.insertLGTMSelectionPanel, this);
@@ -113,7 +112,7 @@ $(function() {
         position: 'absolute',
         bottom: '-10px',
         left: '32%',
-        marginLeft: '-10px',
+        marginLeft: '-13px',
         width: '0',
         height: '0',
         borderTop: '10px solid #333',
@@ -180,16 +179,18 @@ $(function() {
     EmojiPallet.prototype.selectors = {
       starter: '.js-petit-deco-insert-emoji-pallet',
       backdrop: '.js-petit-deco-emoji-pallet-backdrop',
-      pallet: '.emoji-suggestions'
+      pallet: '.js-petit-deco-emoji-pallet'
     };
 
     function EmojiPallet() {
       this.bindEvents = bind(this.bindEvents, this);
       this.insertIcon = bind(this.insertIcon, this);
       this.fetchSuggestions = bind(this.fetchSuggestions, this);
+      this.insertEmojiPallet = bind(this.insertEmojiPallet, this);
       this.insertEmojiPalletBackdrop = bind(this.insertEmojiPalletBackdrop, this);
       this.deferred = new $.Deferred;
       this.insertEmojiPalletBackdrop();
+      this.deferred.promise().then(this.insertEmojiPallet);
       this.deferred.promise().then(this.fetchSuggestions);
       this.deferred.promise().then(this.insertIcon);
       this.deferred.promise().then(this.bindEvents);
@@ -205,22 +206,51 @@ $(function() {
       return this.deferred.resolve();
     };
 
+    EmojiPallet.prototype.insertEmojiPallet = function() {
+      var $emoji_pallet_node, $emoji_pallet_triangle_node;
+      $emoji_pallet_node = $('<div/>').attr({
+        "class": this.selectors['pallet'].replace(/\./, '')
+      });
+      $emoji_pallet_node.css({
+        display: 'none',
+        zIndex: '200',
+        position: 'absolute',
+        width: '660px',
+        height: '200px',
+        padding: '10px',
+        background: '#333',
+        borderRadius: '3px',
+        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.075)',
+        cursor: 'pointer'
+      });
+      $emoji_pallet_triangle_node = $('<div/>').css({
+        zIndex: '300',
+        position: 'absolute',
+        bottom: '-10px',
+        left: '37%',
+        marginLeft: '-10px',
+        width: '0',
+        height: '0',
+        borderTop: '10px solid #333',
+        borderLeft: '10px solid transparent',
+        borderRight: '10px solid transparent'
+      });
+      $emoji_pallet_node.append($emoji_pallet_triangle_node);
+      $emoji_pallet_node.appendTo('body');
+      return this.deferred.resolve();
+    };
+
     EmojiPallet.prototype.fetchSuggestions = function() {
       return $.ajax($('.js-suggester').first().data('url')).done((function(_this) {
         return function(suggestions) {
           var $emoji_suggestion;
           $emoji_suggestion = $(suggestions).filter(COMMON_SELECTORS.EMOJI_SUGGESTIONS).show();
-          $emoji_suggestion.appendTo('body');
-          $(_this.selectors['pallet']).css({
-            display: 'none',
-            position: 'absolute',
-            zIndex: '200',
-            width: '670px',
-            fontSize: '0px',
-            background: '#f7f7f7',
-            height: '200px',
+          $emoji_suggestion.css({
+            fontSize: 0,
+            height: '180px',
             overflow: 'scroll'
           });
+          $(_this.selectors['pallet']).prepend($emoji_suggestion);
           $(_this.selectors['pallet']).find('li').each(function() {
             var $span;
             $span = $(this).find('span');
@@ -261,7 +291,7 @@ $(function() {
           $emoji_pallet_backdrop_node = $(_this.selectors['backdrop']);
           $emoji_pallet_backdrop_node.show();
           $emoji_pallet_node = $(_this.selectors['pallet']);
-          $emoji_pallet_node.css('top', $comment_field.offset().top);
+          $emoji_pallet_node.css('top', $self.offset().top - 210);
           $emoji_pallet_node.css('left', $comment_field.offset().left);
           return $emoji_pallet_node.show();
         };

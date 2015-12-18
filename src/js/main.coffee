@@ -100,7 +100,7 @@ $ ->
         position: 'absolute'
         bottom: '-10px'
         left: '32%'
-        marginLeft: '-10px'
+        marginLeft: '-13px'
         width: '0'
         height: '0'
         borderTop: '10px solid #333'
@@ -160,7 +160,7 @@ $ ->
         $emoji_pallet_node = $(@selectors['panel'])
         $emoji_pallet_node.hide()
 
-    fetchLGTMImage: ($img_node) =>
+    fetchLGTMImage: ($img_node) ->
       # $.getJSON 'http://www.lgtm.in/g', (data) ->
       #   # LGTM画像を挿入する
       #   lgtm_image = data.markdown.split('\n\n')[0]
@@ -172,12 +172,13 @@ $ ->
     selectors:
       starter: '.js-petit-deco-insert-emoji-pallet'
       backdrop: '.js-petit-deco-emoji-pallet-backdrop'
-      pallet: '.emoji-suggestions'
+      pallet: '.js-petit-deco-emoji-pallet'
 
     constructor: ->
       @deferred = new $.Deferred
 
       @insertEmojiPalletBackdrop()
+      @deferred.promise().then(@insertEmojiPallet)
       @deferred.promise().then(@fetchSuggestions)
       @deferred.promise().then(@insertIcon)
       @deferred.promise().then(@bindEvents)
@@ -191,21 +192,53 @@ $ ->
 
       @deferred.resolve()
 
+    insertEmojiPallet: =>
+      $emoji_pallet_node = $('<div/>').attr
+        class: @selectors['pallet'].replace(/\./, '')
+
+      $emoji_pallet_node.css(
+        display: 'none'
+        zIndex: '200'
+        position: 'absolute'
+        width: '660px'
+        height: '200px'
+        padding: '10px'
+        background: '#333'
+        borderRadius: '3px'
+        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.075)'
+        cursor: 'pointer'
+      )
+
+      $emoji_pallet_triangle_node = $('<div/>').css(
+        zIndex: '300'
+        position: 'absolute'
+        bottom: '-10px'
+        left: '37%'
+        marginLeft: '-10px'
+        width: '0'
+        height: '0'
+        borderTop: '10px solid #333'
+        borderLeft: '10px solid transparent'
+        borderRight: '10px solid transparent'
+      )
+
+      $emoji_pallet_node.append $emoji_pallet_triangle_node
+
+      $emoji_pallet_node.appendTo('body')
+
+      @deferred.resolve()
+
     fetchSuggestions: =>
       $.ajax($('.js-suggester').first().data('url')).done (suggestions) =>
         $emoji_suggestion = $(suggestions).filter(COMMON_SELECTORS.EMOJI_SUGGESTIONS).show()
-        $emoji_suggestion.appendTo('body')
 
-        $(@selectors['pallet']).css(
-          display: 'none'
-          position: 'absolute'
-          zIndex: '200'
-          width: '670px'
-          fontSize: '0px'
-          background: '#f7f7f7'
-          height: '200px'
+        $emoji_suggestion.css(
+          fontSize: 0
+          height: '180px'
           overflow: 'scroll'
         )
+
+        $(@selectors['pallet']).prepend($emoji_suggestion)
 
         $(@selectors['pallet']).find('li').each ->
           $span = $(@).find('span')
@@ -246,7 +279,7 @@ $ ->
         $emoji_pallet_backdrop_node.show()
 
         $emoji_pallet_node = $(@selectors['pallet'])
-        $emoji_pallet_node.css 'top', $comment_field.offset().top
+        $emoji_pallet_node.css 'top', $self.offset().top - 210
         $emoji_pallet_node.css 'left', $comment_field.offset().left
         $emoji_pallet_node.show()
 
