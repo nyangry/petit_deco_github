@@ -215,7 +215,7 @@ $(function() {
         display: 'none',
         zIndex: '200',
         position: 'absolute',
-        width: '660px',
+        width: '670px',
         height: '200px',
         padding: '10px',
         background: '#333',
@@ -228,7 +228,7 @@ $(function() {
         position: 'absolute',
         bottom: '-10px',
         left: '37%',
-        marginLeft: '-10px',
+        marginLeft: '-13px',
         width: '0',
         height: '0',
         borderTop: '10px solid #333',
@@ -285,13 +285,13 @@ $(function() {
       $('body').on('click', this.selectors['starter'], (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
-          $self = $(e.target);
+          $self = $(e.currentTarget);
           $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
           $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
           $emoji_pallet_backdrop_node = $(_this.selectors['backdrop']);
           $emoji_pallet_backdrop_node.show();
           $emoji_pallet_node = $(_this.selectors['pallet']);
-          $emoji_pallet_node.css('top', $self.offset().top - 210);
+          $emoji_pallet_node.css('top', $self.offset().top - 200);
           $emoji_pallet_node.css('left', $comment_field.offset().left);
           return $emoji_pallet_node.show();
         };

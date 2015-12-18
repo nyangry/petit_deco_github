@@ -200,7 +200,7 @@ $ ->
         display: 'none'
         zIndex: '200'
         position: 'absolute'
-        width: '660px'
+        width: '670px'
         height: '200px'
         padding: '10px'
         background: '#333'
@@ -214,7 +214,7 @@ $ ->
         position: 'absolute'
         bottom: '-10px'
         left: '37%'
-        marginLeft: '-10px'
+        marginLeft: '-13px'
         width: '0'
         height: '0'
         borderTop: '10px solid #333'
@@ -270,7 +270,7 @@ $ ->
       $current_form = null
 
       $('body').on 'click', @selectors['starter'], (e) =>
-        $self = $(e.target)
+        $self = $(e.currentTarget)
 
         $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
@@ -279,7 +279,7 @@ $ ->
         $emoji_pallet_backdrop_node.show()
 
         $emoji_pallet_node = $(@selectors['pallet'])
-        $emoji_pallet_node.css 'top', $self.offset().top - 210
+        $emoji_pallet_node.css 'top', $self.offset().top - 200
         $emoji_pallet_node.css 'left', $comment_field.offset().left
         $emoji_pallet_node.show()
 
