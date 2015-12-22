@@ -27,7 +27,6 @@ $ ->
       $(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).each ->
         $(@).find('.tabnav-tabs').append $new_tab.clone()
 
-
     bindEvents: ->
       $('body').on 'click', @selectors['starter'], (e) ->
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
@@ -71,6 +70,7 @@ $ ->
         display: 'none'
         zIndex: '200'
         position: 'absolute'
+        cursor: 'pointer'
         width: '640px'
         height: '220px'
         background: '#333'
@@ -129,12 +129,22 @@ $ ->
 
       @deferred.resolve()
 
+    fetchLGTMImage: ($img_node) ->
+      port = chrome.runtime.connect(name: 'petit-deco-github')
+
+      port.postMessage()
+
+      port.onMessage.addListener (markdown) ->
+        $img_node.data 'markdown', markdown
+
+        $img_node.attr
+          src: markdown.match(/http:[^)]+/)[0]
+
     bindEvents: =>
       $current_form = null
 
       $('body').on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
-
 
         $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
@@ -153,19 +163,27 @@ $ ->
         $lgtm_selection_panel_backdrop_node.show()
         $lgtm_selection_panel_node.show()
 
-
       $('body').on 'click', @selectors['backdrop'], (e) =>
         $(e.target).hide()
 
-        $emoji_pallet_node = $(@selectors['panel'])
-        $emoji_pallet_node.hide()
+        $lgtm_selection_panel_node = $(@selectors['panel'])
+        $lgtm_selection_panel_node.hide()
 
-    fetchLGTMImage: ($img_node) ->
-      # $.getJSON 'http://www.lgtm.in/g', (data) ->
-      #   # LGTM画像を挿入する
-      #   lgtm_image = data.markdown.split('\n\n')[0]
-      #   console.log lgtm_image
-      #   # $text_area.val $text_area.val() + ' ' + lgtm_image
+      $('body').on 'click', @selectors['lgtm_image'], (e) =>
+        $self = $(e.currentTarget)
+
+        $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
+
+        $comment_field.val $comment_field.val() + ' ' + $self.data('markdown')
+
+        $lgtm_selection_panel_backdrop_node = $(@selectors['backdrop'])
+        $lgtm_selection_panel_backdrop_node.hide()
+
+        $lgtm_selection_panel_node = $(@selectors['panel'])
+        $lgtm_selection_panel_node.hide()
+
+        # テキストエリアにフォーカスする
+        $comment_field.focus()
 
 
   class EmojiPallet
@@ -309,8 +327,6 @@ $ ->
 
         # テキストエリアにフォーカスする
         $comment_field.focus()
-
-      @deferred.resolve()
 
 
   decoratePreviewableCommentForm = ->

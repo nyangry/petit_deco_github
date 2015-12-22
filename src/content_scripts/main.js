@@ -84,6 +84,7 @@ $(function() {
         display: 'none',
         zIndex: '200',
         position: 'absolute',
+        cursor: 'pointer',
         width: '640px',
         height: '220px',
         background: '#333',
@@ -139,6 +140,20 @@ $(function() {
       return this.deferred.resolve();
     };
 
+    LGTMImageSelection.prototype.fetchLGTMImage = function($img_node) {
+      var port;
+      port = chrome.runtime.connect({
+        name: 'petit-deco-github'
+      });
+      port.postMessage();
+      return port.onMessage.addListener(function(markdown) {
+        $img_node.data('markdown', markdown);
+        return $img_node.attr({
+          src: markdown.match(/http:[^)]+/)[0]
+        });
+      });
+    };
+
     LGTMImageSelection.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
@@ -160,17 +175,28 @@ $(function() {
           return $lgtm_selection_panel_node.show();
         };
       })(this));
-      return $('body').on('click', this.selectors['backdrop'], (function(_this) {
+      $('body').on('click', this.selectors['backdrop'], (function(_this) {
         return function(e) {
-          var $emoji_pallet_node;
+          var $lgtm_selection_panel_node;
           $(e.target).hide();
-          $emoji_pallet_node = $(_this.selectors['panel']);
-          return $emoji_pallet_node.hide();
+          $lgtm_selection_panel_node = $(_this.selectors['panel']);
+          return $lgtm_selection_panel_node.hide();
+        };
+      })(this));
+      return $('body').on('click', this.selectors['lgtm_image'], (function(_this) {
+        return function(e) {
+          var $comment_field, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
+          $self = $(e.currentTarget);
+          $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
+          $comment_field.val($comment_field.val() + ' ' + $self.data('markdown'));
+          $lgtm_selection_panel_backdrop_node = $(_this.selectors['backdrop']);
+          $lgtm_selection_panel_backdrop_node.hide();
+          $lgtm_selection_panel_node = $(_this.selectors['panel']);
+          $lgtm_selection_panel_node.hide();
+          return $comment_field.focus();
         };
       })(this));
     };
-
-    LGTMImageSelection.prototype.fetchLGTMImage = function($img_node) {};
 
     return LGTMImageSelection;
 
@@ -304,7 +330,7 @@ $(function() {
           return $emoji_pallet_node.hide();
         };
       })(this));
-      $('body').on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
+      return $('body').on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
           $self = $(e.currentTarget);
@@ -317,7 +343,6 @@ $(function() {
           return $comment_field.focus();
         };
       })(this));
-      return this.deferred.resolve();
     };
 
     return EmojiPallet;
