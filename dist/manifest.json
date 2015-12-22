@@ -6,13 +6,24 @@
     "description": "petit decoration chrome extension on github.",
 
     "content_scripts": [
-        {
-            "matches": [ "https://github.com/*" ],
-            "js": [
-                "js/app.js"
-            ]
-        }
-      ],
+      {
+          "matches": [ "https://github.com/*" ],
+          "js": [
+              "content_scripts/app.js"
+          ]
+      }
+    ],
+
+    "background": {
+      "scripts": [ "eventPage.js" ],
+      "persistent": false
+    },
+
+    "externally_connectable": {
+      "matches": [ "*://*.github.com/*" ]
+    },
+
+    "permissions": [ "background", "http://www.lgtm.in/*" ],
 
     "web_accessible_resources": [
       "bower_components/jquery/dist/jquery.min.map"
