@@ -1,6 +1,6 @@
 {
   "name": "petit_deco_github",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "petit decoration chrome extension on github.",
   "main": "main.js",
   "scripts": {
