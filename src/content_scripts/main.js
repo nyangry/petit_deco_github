@@ -278,10 +278,13 @@ $(function() {
           });
           $(_this.selectors['pallet']).prepend($emoji_suggestion);
           $(_this.selectors['pallet']).find('li').each(function() {
-            var $span;
-            $span = $(this).find('span');
-            $(this).html($span);
+            var emoji;
+            emoji = $(this).data('raw-value');
+            $(this).html(emoji);
             return $(this).css({
+              fontSize: '20px',
+              height: '20px',
+              width: '20px',
               display: 'inline-block'
             });
           });

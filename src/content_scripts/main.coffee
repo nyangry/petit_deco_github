@@ -259,11 +259,14 @@ $ ->
         $(@selectors['pallet']).prepend($emoji_suggestion)
 
         $(@selectors['pallet']).find('li').each ->
-          $span = $(@).find('span')
+          emoji = $(@).data('raw-value')
 
-          $(@).html($span)
+          $(@).html(emoji)
 
           $(@).css(
+            fontSize: '20px'
+            height: '20px'
+            width: '20px'
             display: 'inline-block'
           )
 
@@ -300,7 +303,6 @@ $ ->
         $emoji_pallet_node.css 'top', $self.offset().top - 200
         $emoji_pallet_node.css 'left', $comment_field.offset().left
         $emoji_pallet_node.show()
-
 
       # 絵文字パレット以外の領域クリックでパレットを閉じる
       $('body').on 'click', @selectors['backdrop'], (e) =>
