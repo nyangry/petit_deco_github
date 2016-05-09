@@ -41,5 +41,5 @@ gulp.task('octicons', function() {
       './node_modules/octicons/octicons/octicons.ttf',
       './node_modules/octicons/octicons/octicons.svg'
     ])
-    .pipe(gulp.dest('src/content_scripts/'));
+    .pipe(gulp.dest('dist/content_scripts/'));
 });
