@@ -146,10 +146,10 @@ $(function() {
         name: 'petit-deco-github'
       });
       port.postMessage();
-      return port.onMessage.addListener(function(markdown) {
-        $img_node.data('markdown', markdown);
+      return port.onMessage.addListener(function(response) {
+        $img_node.data('markdown', response.markdown);
         return $img_node.attr({
-          src: markdown.match(/http:[^)]+/)[0]
+          src: response.base64_image
         });
       });
     };

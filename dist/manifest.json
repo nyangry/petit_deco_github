@@ -28,7 +28,11 @@
       "matches": [ "*://*.github.com/*" ]
     },
 
-    "permissions": [ "background", "http://www.lgtm.in/*" ],
+    "permissions": [
+      "background",
+      "https://*/",
+      "http://*/"
+    ],
 
     "web_accessible_resources": [
       "content_scripts/*.eot",

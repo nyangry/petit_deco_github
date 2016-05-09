@@ -134,11 +134,11 @@ $ ->
 
       port.postMessage()
 
-      port.onMessage.addListener (markdown) ->
-        $img_node.data 'markdown', markdown
+      port.onMessage.addListener (response) ->
+        $img_node.data 'markdown', response.markdown
 
         $img_node.attr
-          src: markdown.match(/http:[^)]+/)[0]
+          src: response.base64_image
 
     bindEvents: =>
       $current_form = null
