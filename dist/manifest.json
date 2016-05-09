@@ -7,7 +7,12 @@
 
     "content_scripts": [
       {
-          "matches": [ "https://github.com/*" ],
+          "matches": [
+            "https://github.com/*"
+          ],
+          "css": [
+            "content_scripts/octicons.css"
+          ],
           "js": [
               "content_scripts/app.js"
           ]
@@ -26,6 +31,9 @@
     "permissions": [ "background", "http://www.lgtm.in/*" ],
 
     "web_accessible_resources": [
-      "bower_components/jquery/dist/jquery.min.map"
+      "content_scripts/*.eot",
+      "content_scripts/*.woff",
+      "content_scripts/*.ttf",
+      "content_scripts/*.svg"
     ]
 }
