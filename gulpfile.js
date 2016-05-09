@@ -5,7 +5,7 @@ var coffee = require('gulp-coffee');
 var gutil  = require('gulp-util');
 
 // default task
-gulp.task('default', ['coffee', 'dist_js'], function () {
+gulp.task('default', ['coffee', 'dist_js', 'octicons'], function () {
   gulp.watch('src/content_scripts/*.coffee', ['dist_js']);
 });
 
@@ -29,4 +29,17 @@ gulp.task('dist_js', ['coffee'], function() {
     }).on('error', gutil.log))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('dist/content_scripts'));
+});
+
+// octicons
+gulp.task('octicons', function() {
+  gulp
+    .src([
+      './node_modules/octicons/octicons/octicons.css',
+      './node_modules/octicons/octicons/octicons.eot',
+      './node_modules/octicons/octicons/octicons.woff',
+      './node_modules/octicons/octicons/octicons.ttf',
+      './node_modules/octicons/octicons/octicons.svg'
+    ])
+    .pipe(gulp.dest('src/content_scripts/'));
 });
