@@ -1,4 +1,6 @@
 $ ->
+  $body = $('body')
+
   COMMON_SELECTORS =
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form'
     COMMENT_FIELD: '.js-comment-field'
@@ -28,7 +30,7 @@ $ ->
         $(@).find('.tabnav-tabs').append $new_tab.clone()
 
     bindEvents: ->
-      $('body').on 'click', @selectors['starter'], (e) ->
+      $body.on 'click', @selectors['starter'], (e) ->
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
 
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
@@ -58,7 +60,7 @@ $ ->
         class: @selectors['backdrop'].replace(/\./, '')
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
 
-      $lgtm_selection_panel_backdrop_node.appendTo('body')
+      $lgtm_selection_panel_backdrop_node.appendTo $body
 
       @deferred.resolve()
 
@@ -110,7 +112,7 @@ $ ->
 
       $lgtm_selection_panel_node.append $lgtm_selection_panel_triangle_node
 
-      $lgtm_selection_panel_node.appendTo('body')
+      $lgtm_selection_panel_node.appendTo $body
 
       @deferred.resolve()
 
@@ -143,7 +145,7 @@ $ ->
     bindEvents: =>
       $current_form = null
 
-      $('body').on 'click', @selectors['starter'], (e) =>
+      $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
         $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
@@ -163,13 +165,13 @@ $ ->
         $lgtm_selection_panel_backdrop_node.show()
         $lgtm_selection_panel_node.show()
 
-      $('body').on 'click', @selectors['backdrop'], (e) =>
+      $body.on 'click', @selectors['backdrop'], (e) =>
         $(e.target).hide()
 
         $lgtm_selection_panel_node = $(@selectors['panel'])
         $lgtm_selection_panel_node.hide()
 
-      $('body').on 'click', @selectors['lgtm_image'], (e) =>
+      $body.on 'click', @selectors['lgtm_image'], (e) =>
         $self = $(e.currentTarget)
 
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
@@ -206,7 +208,7 @@ $ ->
         class: @selectors['backdrop'].replace(/\./, '')
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
 
-      $emoji_pallet_backdrop_node.appendTo('body')
+      $emoji_pallet_backdrop_node.appendTo $body
 
       @deferred.resolve()
 
@@ -242,7 +244,7 @@ $ ->
 
       $emoji_pallet_node.append $emoji_pallet_triangle_node
 
-      $emoji_pallet_node.appendTo('body')
+      $emoji_pallet_node.appendTo $body
 
       @deferred.resolve()
 
@@ -290,7 +292,7 @@ $ ->
     bindEvents: =>
       $current_form = null
 
-      $('body').on 'click', @selectors['starter'], (e) =>
+      $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
         $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
@@ -305,14 +307,14 @@ $ ->
         $emoji_pallet_node.show()
 
       # 絵文字パレット以外の領域クリックでパレットを閉じる
-      $('body').on 'click', @selectors['backdrop'], (e) =>
+      $body.on 'click', @selectors['backdrop'], (e) =>
         $(e.target).hide()
 
         $emoji_pallet_node = $(@selectors['pallet'])
         $emoji_pallet_node.hide()
 
       # 絵文字を選択する
-      $('body').on 'click', COMMON_SELECTORS.NAVIGATION_ITEM, (e) =>
+      $body.on 'click', COMMON_SELECTORS.NAVIGATION_ITEM, (e) =>
         $self = $(e.currentTarget)
 
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)

@@ -1,7 +1,8 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 $(function() {
-  var COMMON_SELECTORS, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
+  var $body, COMMON_SELECTORS, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
+  $body = $('body');
   COMMON_SELECTORS = {
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form',
     COMMENT_FIELD: '.js-comment-field',
@@ -33,7 +34,7 @@ $(function() {
     };
 
     PlusOne.prototype.bindEvents = function() {
-      return $('body').on('click', this.selectors['starter'], function(e) {
+      return $body.on('click', this.selectors['starter'], function(e) {
         var $comment_field, $current_form;
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
@@ -71,7 +72,7 @@ $(function() {
         "class": this.selectors['backdrop'].replace(/\./, ''),
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
       });
-      $lgtm_selection_panel_backdrop_node.appendTo('body');
+      $lgtm_selection_panel_backdrop_node.appendTo($body);
       return this.deferred.resolve();
     };
 
@@ -121,7 +122,7 @@ $(function() {
         borderRight: '10px solid transparent'
       });
       $lgtm_selection_panel_node.append($lgtm_selection_panel_triangle_node);
-      $lgtm_selection_panel_node.appendTo('body');
+      $lgtm_selection_panel_node.appendTo($body);
       return this.deferred.resolve();
     };
 
@@ -157,7 +158,7 @@ $(function() {
     LGTMImageSelection.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
-      $('body').on('click', this.selectors['starter'], (function(_this) {
+      $body.on('click', this.selectors['starter'], (function(_this) {
         return function(e) {
           var $comment_field, $lgtm_images, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
           $self = $(e.currentTarget);
@@ -175,7 +176,7 @@ $(function() {
           return $lgtm_selection_panel_node.show();
         };
       })(this));
-      $('body').on('click', this.selectors['backdrop'], (function(_this) {
+      $body.on('click', this.selectors['backdrop'], (function(_this) {
         return function(e) {
           var $lgtm_selection_panel_node;
           $(e.target).hide();
@@ -183,7 +184,7 @@ $(function() {
           return $lgtm_selection_panel_node.hide();
         };
       })(this));
-      return $('body').on('click', this.selectors['lgtm_image'], (function(_this) {
+      return $body.on('click', this.selectors['lgtm_image'], (function(_this) {
         return function(e) {
           var $comment_field, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
           $self = $(e.currentTarget);
@@ -228,7 +229,7 @@ $(function() {
         "class": this.selectors['backdrop'].replace(/\./, ''),
         style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
       });
-      $emoji_pallet_backdrop_node.appendTo('body');
+      $emoji_pallet_backdrop_node.appendTo($body);
       return this.deferred.resolve();
     };
 
@@ -262,7 +263,7 @@ $(function() {
         borderRight: '10px solid transparent'
       });
       $emoji_pallet_node.append($emoji_pallet_triangle_node);
-      $emoji_pallet_node.appendTo('body');
+      $emoji_pallet_node.appendTo($body);
       return this.deferred.resolve();
     };
 
@@ -311,7 +312,7 @@ $(function() {
     EmojiPallet.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
-      $('body').on('click', this.selectors['starter'], (function(_this) {
+      $body.on('click', this.selectors['starter'], (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
           $self = $(e.currentTarget);
@@ -325,7 +326,7 @@ $(function() {
           return $emoji_pallet_node.show();
         };
       })(this));
-      $('body').on('click', this.selectors['backdrop'], (function(_this) {
+      $body.on('click', this.selectors['backdrop'], (function(_this) {
         return function(e) {
           var $emoji_pallet_node;
           $(e.target).hide();
@@ -333,7 +334,7 @@ $(function() {
           return $emoji_pallet_node.hide();
         };
       })(this));
-      return $('body').on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
+      return $body.on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
           $self = $(e.currentTarget);
