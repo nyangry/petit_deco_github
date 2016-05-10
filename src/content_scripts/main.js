@@ -359,5 +359,8 @@ $(function() {
     new LGTMImageSelection;
     return new EmojiPallet;
   };
-  return decoratePreviewableCommentForm();
+  decoratePreviewableCommentForm();
+  return $(document).on('pjax:success', function() {
+    return decoratePreviewableCommentForm();
+  });
 });
