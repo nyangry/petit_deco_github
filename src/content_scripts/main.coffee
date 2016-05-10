@@ -30,6 +30,8 @@ $ ->
         $(@).find('.tabnav-tabs').append $new_tab.clone()
 
     bindEvents: ->
+      $body.off 'click', @selectors['starter']
+
       $body.on 'click', @selectors['starter'], (e) ->
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
 
@@ -145,6 +147,8 @@ $ ->
     bindEvents: =>
       $current_form = null
 
+      $body.off 'click', @selectors['starter']
+
       $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
@@ -165,11 +169,15 @@ $ ->
         $lgtm_selection_panel_backdrop_node.show()
         $lgtm_selection_panel_node.show()
 
+      $body.off 'click', @selectors['backdrop']
+
       $body.on 'click', @selectors['backdrop'], (e) =>
         $(e.target).hide()
 
         $lgtm_selection_panel_node = $(@selectors['panel'])
         $lgtm_selection_panel_node.hide()
+
+      $body.off 'click', @selectors['lgtm_image']
 
       $body.on 'click', @selectors['lgtm_image'], (e) =>
         $self = $(e.currentTarget)
@@ -292,6 +300,8 @@ $ ->
     bindEvents: =>
       $current_form = null
 
+      $body.off 'click', @selectors['starter']
+
       $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
@@ -307,6 +317,8 @@ $ ->
         $emoji_pallet_node.show()
 
       # 絵文字パレット以外の領域クリックでパレットを閉じる
+      $body.off 'click', @selectors['backdrop']
+
       $body.on 'click', @selectors['backdrop'], (e) =>
         $(e.target).hide()
 
@@ -314,6 +326,8 @@ $ ->
         $emoji_pallet_node.hide()
 
       # 絵文字を選択する
+      $body.off 'click', COMMON_SELECTORS.NAVIGATION_ITEM
+
       $body.on 'click', COMMON_SELECTORS.NAVIGATION_ITEM, (e) =>
         $self = $(e.currentTarget)
 

@@ -34,6 +34,7 @@ $(function() {
     };
 
     PlusOne.prototype.bindEvents = function() {
+      $body.off('click', this.selectors['starter']);
       return $body.on('click', this.selectors['starter'], function(e) {
         var $comment_field, $current_form;
         $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
@@ -158,6 +159,7 @@ $(function() {
     LGTMImageSelection.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
+      $body.off('click', this.selectors['starter']);
       $body.on('click', this.selectors['starter'], (function(_this) {
         return function(e) {
           var $comment_field, $lgtm_images, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
@@ -176,6 +178,7 @@ $(function() {
           return $lgtm_selection_panel_node.show();
         };
       })(this));
+      $body.off('click', this.selectors['backdrop']);
       $body.on('click', this.selectors['backdrop'], (function(_this) {
         return function(e) {
           var $lgtm_selection_panel_node;
@@ -184,6 +187,7 @@ $(function() {
           return $lgtm_selection_panel_node.hide();
         };
       })(this));
+      $body.off('click', this.selectors['lgtm_image']);
       return $body.on('click', this.selectors['lgtm_image'], (function(_this) {
         return function(e) {
           var $comment_field, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
@@ -312,6 +316,7 @@ $(function() {
     EmojiPallet.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
+      $body.off('click', this.selectors['starter']);
       $body.on('click', this.selectors['starter'], (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
@@ -326,6 +331,7 @@ $(function() {
           return $emoji_pallet_node.show();
         };
       })(this));
+      $body.off('click', this.selectors['backdrop']);
       $body.on('click', this.selectors['backdrop'], (function(_this) {
         return function(e) {
           var $emoji_pallet_node;
@@ -334,6 +340,7 @@ $(function() {
           return $emoji_pallet_node.hide();
         };
       })(this));
+      $body.off('click', COMMON_SELECTORS.NAVIGATION_ITEM);
       return $body.on('click', COMMON_SELECTORS.NAVIGATION_ITEM, (function(_this) {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
