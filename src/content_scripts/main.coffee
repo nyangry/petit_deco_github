@@ -33,13 +33,15 @@ $ ->
       $body.off 'click', @selectors['starter']
 
       $body.on 'click', @selectors['starter'], (e) ->
-        $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
+        $current_form = $(e.target).parents 'form'
 
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
         $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:')
 
         $comment_field.focus()
+
+        $current_form.find('button[type=submit]').click()
 
 
   class LGTMImageSelection
@@ -152,7 +154,7 @@ $ ->
       $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
-        $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
+        $current_form  = $self.parents 'form'
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
         $lgtm_selection_panel_backdrop_node = $(@selectors['backdrop'])
@@ -305,7 +307,7 @@ $ ->
       $body.on 'click', @selectors['starter'], (e) =>
         $self = $(e.currentTarget)
 
-        $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM)
+        $current_form  = $self.parents 'form'
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD)
 
         $emoji_pallet_backdrop_node = $(@selectors['backdrop'])

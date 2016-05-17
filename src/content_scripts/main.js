@@ -37,10 +37,11 @@ $(function() {
       $body.off('click', this.selectors['starter']);
       return $body.on('click', this.selectors['starter'], function(e) {
         var $comment_field, $current_form;
-        $current_form = $(e.target).parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
+        $current_form = $(e.target).parents('form');
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
         $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:');
-        return $comment_field.focus();
+        $comment_field.focus();
+        return $current_form.find('button[type=submit]').click();
       });
     };
 
@@ -164,7 +165,7 @@ $(function() {
         return function(e) {
           var $comment_field, $lgtm_images, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
           $self = $(e.currentTarget);
-          $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
+          $current_form = $self.parents('form');
           $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
           $lgtm_selection_panel_backdrop_node = $(_this.selectors['backdrop']);
           $lgtm_selection_panel_node = $(_this.selectors['panel']);
@@ -321,7 +322,7 @@ $(function() {
         return function(e) {
           var $comment_field, $emoji_pallet_backdrop_node, $emoji_pallet_node, $self;
           $self = $(e.currentTarget);
-          $current_form = $self.parents(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM);
+          $current_form = $self.parents('form');
           $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
           $emoji_pallet_backdrop_node = $(_this.selectors['backdrop']);
           $emoji_pallet_backdrop_node.show();
