@@ -349,12 +349,56 @@ $ ->
         $comment_field.focus()
 
 
+  # テキストエリアでの cmd + enter の挙動をフックして、Add single comment ボタンを押したことにする
+  class CmdEnterBehavior
+    constructor: ->
+      @bindEvents()
+
+    bindEvents: ->
+      # textarea の動的な追加に対応する
+      $(document).on 'click', '.js-add-single-line-comment', @onClick
+
+      # GitHub のデフォルトの挙動を上書きする
+      #
+      # GitHub's CODE:
+      #   return "ctrl+enter" === t.hotkey || "meta+enter" === t.hotkey ? (n = e(this).closest("form"),
+      #   i = n.find("input[type=submit], button[type=submit]").first(),
+      #   i.prop("disabled") || n.submit(),
+      #   !1) : void 0
+      $('.js-quick-submit').on 'keydown', @onKeydown
+
+    onClick: (e) =>
+      $inserted_tr = $(e.target).closest('tr').next()
+
+      $inserted_tr.find('.js-quick-submit').on 'keydown', @onKeydown
+
+    onKeydown: (e) ->
+      return unless (e.keyCode == 13 and e.metaKey)
+
+      $form = $(e.target.form)
+
+      # Add single comment ボタンを探してみて、見つかれば click event を発火させる
+      $add_single_comment_button = $form.find('button[name=single_comment]')
+
+      if $add_single_comment_button.length isnt 0
+        $add_single_comment_button.trigger 'click'
+
+        return
+
+      # Add single comment ボタンが見つからなかった場合、他の submit ボタンが disabled でなければ、click event を発火させる
+      $other_submit_button = $form.find("input[type=submit], button[type=submit]").first()
+
+      unless $other_submit_button.prop 'disabled'
+        $other_submit_button.trigger 'click'
+
+
   decoratePreviewableCommentForm = ->
     return if $(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).length is 0
 
     new PlusOne
     new LGTMImageSelection
     new EmojiPallet
+    new CmdEnterBehavior
 
   decoratePreviewableCommentForm()
 

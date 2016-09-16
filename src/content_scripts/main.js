@@ -1,7 +1,7 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 $(function() {
-  var $body, COMMON_SELECTORS, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
+  var $body, COMMON_SELECTORS, CmdEnterBehavior, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
   $body = $('body');
   COMMON_SELECTORS = {
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form',
@@ -360,13 +360,51 @@ $(function() {
     return EmojiPallet;
 
   })();
+  CmdEnterBehavior = (function() {
+    function CmdEnterBehavior() {
+      this.onClick = bind(this.onClick, this);
+      this.bindEvents();
+    }
+
+    CmdEnterBehavior.prototype.bindEvents = function() {
+      $(document).on('click', '.js-add-single-line-comment', this.onClick);
+      return $('.js-quick-submit').on('keydown', this.onKeydown);
+    };
+
+    CmdEnterBehavior.prototype.onClick = function(e) {
+      var $inserted_tr;
+      $inserted_tr = $(e.target).closest('tr').next();
+      return $inserted_tr.find('.js-quick-submit').on('keydown', this.onKeydown);
+    };
+
+    CmdEnterBehavior.prototype.onKeydown = function(e) {
+      var $add_single_comment_button, $form, $other_submit_button;
+      if (!(e.keyCode === 13 && e.metaKey)) {
+        return;
+      }
+      $form = $(e.target.form);
+      $add_single_comment_button = $form.find('button[name=single_comment]');
+      if ($add_single_comment_button.length !== 0) {
+        $add_single_comment_button.trigger('click');
+        return;
+      }
+      $other_submit_button = $form.find("input[type=submit], button[type=submit]").first();
+      if (!$other_submit_button.prop('disabled')) {
+        return $other_submit_button.trigger('click');
+      }
+    };
+
+    return CmdEnterBehavior;
+
+  })();
   decoratePreviewableCommentForm = function() {
     if ($(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).length === 0) {
       return;
     }
     new PlusOne;
     new LGTMImageSelection;
-    return new EmojiPallet;
+    new EmojiPallet;
+    return new CmdEnterBehavior;
   };
   decoratePreviewableCommentForm();
   return $(document).on('pjax:end', function() {
