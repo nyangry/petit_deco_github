@@ -379,7 +379,16 @@ $ ->
     onClick: (e) =>
       $inserted_tr = $(e.target).closest('tr').next()
 
-      $inserted_tr.find('.js-quick-submit').on 'keydown', @onKeydown
+      # textarea イベントを削ぎ落とすために、Node を clone して、差し替える
+      $textarea        = $inserted_tr.find('.js-quick-submit')
+      $cloned_textarea = $textarea.clone()
+
+      $textarea.after $cloned_textarea
+      $textarea.remove()
+
+      $cloned_textarea.on 'keydown', @onKeydown
+
+      $cloned_textarea.focus()
 
     onKeydown: (e) ->
       return unless (e.keyCode == 13 and e.metaKey)
@@ -390,7 +399,7 @@ $ ->
       $add_single_comment_button = $form.find('button[name=single_comment]')
 
       if $add_single_comment_button.length isnt 0
-        $add_single_comment_button.trigger 'click'
+        $add_single_comment_button.click()
 
         return
 
@@ -398,7 +407,7 @@ $ ->
       $other_submit_button = $form.find("input[type=submit], button[type=submit]").first()
 
       unless $other_submit_button.prop 'disabled'
-        $other_submit_button.trigger 'click'
+        $other_submit_button.click()
 
 
   decoratePreviewableCommentForm = ->

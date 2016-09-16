@@ -388,9 +388,14 @@ $(function() {
     };
 
     CmdEnterBehavior.prototype.onClick = function(e) {
-      var $inserted_tr;
+      var $cloned_textarea, $inserted_tr, $textarea;
       $inserted_tr = $(e.target).closest('tr').next();
-      return $inserted_tr.find('.js-quick-submit').on('keydown', this.onKeydown);
+      $textarea = $inserted_tr.find('.js-quick-submit');
+      $cloned_textarea = $textarea.clone();
+      $textarea.after($cloned_textarea);
+      $textarea.remove();
+      $cloned_textarea.on('keydown', this.onKeydown);
+      return $cloned_textarea.focus();
     };
 
     CmdEnterBehavior.prototype.onKeydown = function(e) {
@@ -401,12 +406,12 @@ $(function() {
       $form = $(e.target.form);
       $add_single_comment_button = $form.find('button[name=single_comment]');
       if ($add_single_comment_button.length !== 0) {
-        $add_single_comment_button.trigger('click');
+        $add_single_comment_button.click();
         return;
       }
       $other_submit_button = $form.find("input[type=submit], button[type=submit]").first();
       if (!$other_submit_button.prop('disabled')) {
-        return $other_submit_button.trigger('click');
+        return $other_submit_button.click();
       }
     };
 
