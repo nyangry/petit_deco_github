@@ -7,6 +7,7 @@ $ ->
     EMOJI_SUGGESTIONS: '.emoji-suggestions'
     NAVIGATION_ITEM: '.js-navigation-item'
 
+  fetched_lgtm_responses = []
 
   class PlusOne
     selectors:
@@ -42,6 +43,20 @@ $ ->
         $comment_field.focus()
 
         $current_form.find('button[type=submit]').click()
+
+
+  class FetchLGTMImage
+    constructor: ->
+      for f in [@fetch, @fetch, @fetch]
+        f()
+
+    fetch: ->
+      port = chrome.runtime.connect(name: 'petit-deco-github')
+
+      port.postMessage()
+
+      port.onMessage.addListener (response) ->
+        fetched_lgtm_responses.push response
 
 
   class LGTMImageSelection
@@ -135,17 +150,6 @@ $ ->
 
       @deferred.resolve()
 
-    fetchLGTMImage: ($img_node) ->
-      port = chrome.runtime.connect(name: 'petit-deco-github')
-
-      port.postMessage()
-
-      port.onMessage.addListener (response) ->
-        $img_node.data 'markdown', response.markdown
-
-        $img_node.attr
-          src: response.base64_image
-
     bindEvents: =>
       $current_form = null
 
@@ -165,8 +169,13 @@ $ ->
 
         $lgtm_images = $lgtm_selection_panel_node.find(@selectors['lgtm_image'])
 
-        $lgtm_images.each (_i, element)=>
-          @fetchLGTMImage $(element)
+        $lgtm_images.each (i, element) ->
+          response = fetched_lgtm_responses[i]
+
+          $(element).data 'markdown', response.markdown
+
+          $(element).attr
+            src: response.base64_image
 
         $lgtm_selection_panel_backdrop_node.show()
         $lgtm_selection_panel_node.show()
@@ -396,6 +405,7 @@ $ ->
     return if $(COMMON_SELECTORS.PREVIEWABLE_COMMENT_FORM).length is 0
 
     new PlusOne
+    new FetchLGTMImage
     new LGTMImageSelection
     new EmojiPallet
     new CmdEnterBehavior

@@ -1,7 +1,7 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 $(function() {
-  var $body, COMMON_SELECTORS, CmdEnterBehavior, EmojiPallet, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm;
+  var $body, COMMON_SELECTORS, CmdEnterBehavior, EmojiPallet, FetchLGTMImage, LGTMImageSelection, PlusOne, decoratePreviewableCommentForm, fetched_lgtm_responses;
   $body = $('body');
   COMMON_SELECTORS = {
     PREVIEWABLE_COMMENT_FORM: '.js-previewable-comment-form',
@@ -9,6 +9,7 @@ $(function() {
     EMOJI_SUGGESTIONS: '.emoji-suggestions',
     NAVIGATION_ITEM: '.js-navigation-item'
   };
+  fetched_lgtm_responses = [];
   PlusOne = (function() {
     PlusOne.prototype.selectors = {
       starter: '.js-petit-deco-insert-plus-one'
@@ -46,6 +47,30 @@ $(function() {
     };
 
     return PlusOne;
+
+  })();
+  FetchLGTMImage = (function() {
+    function FetchLGTMImage() {
+      var f, j, len, ref;
+      ref = [this.fetch, this.fetch, this.fetch];
+      for (j = 0, len = ref.length; j < len; j++) {
+        f = ref[j];
+        f();
+      }
+    }
+
+    FetchLGTMImage.prototype.fetch = function() {
+      var port;
+      port = chrome.runtime.connect({
+        name: 'petit-deco-github'
+      });
+      port.postMessage();
+      return port.onMessage.addListener(function(response) {
+        return fetched_lgtm_responses.push(response);
+      });
+    };
+
+    return FetchLGTMImage;
 
   })();
   LGTMImageSelection = (function() {
@@ -143,20 +168,6 @@ $(function() {
       return this.deferred.resolve();
     };
 
-    LGTMImageSelection.prototype.fetchLGTMImage = function($img_node) {
-      var port;
-      port = chrome.runtime.connect({
-        name: 'petit-deco-github'
-      });
-      port.postMessage();
-      return port.onMessage.addListener(function(response) {
-        $img_node.data('markdown', response.markdown);
-        return $img_node.attr({
-          src: response.base64_image
-        });
-      });
-    };
-
     LGTMImageSelection.prototype.bindEvents = function() {
       var $current_form;
       $current_form = null;
@@ -172,8 +183,13 @@ $(function() {
           $lgtm_selection_panel_node.css('top', $self.offset().top - 220);
           $lgtm_selection_panel_node.css('left', $comment_field.offset().left);
           $lgtm_images = $lgtm_selection_panel_node.find(_this.selectors['lgtm_image']);
-          $lgtm_images.each(function(_i, element) {
-            return _this.fetchLGTMImage($(element));
+          $lgtm_images.each(function(i, element) {
+            var response;
+            response = fetched_lgtm_responses[i];
+            $(element).data('markdown', response.markdown);
+            return $(element).attr({
+              src: response.base64_image
+            });
           });
           $lgtm_selection_panel_backdrop_node.show();
           return $lgtm_selection_panel_node.show();
@@ -402,6 +418,7 @@ $(function() {
       return;
     }
     new PlusOne;
+    new FetchLGTMImage;
     new LGTMImageSelection;
     new EmojiPallet;
     return new CmdEnterBehavior;
