@@ -2,14 +2,14 @@ chrome.runtime.onConnect.addListener(function(port) {
   port.onMessage.addListener(function() {
     var get_json_request = new XMLHttpRequest();
 
-    get_json_request.open('GET', 'http://www.lgtm.in/g', true);
+    get_json_request.open('GET', 'https://lgtm.in/g', true);
     get_json_request.setRequestHeader('Accept', 'application/json');
 
     get_json_request.onload = function() {
       if (get_json_request.status >= 200 && get_json_request.status < 400) {
         var data             = JSON.parse(get_json_request.responseText);
         var markdown         = data.markdown.match(/!\[LGTM\]\(.*?\)/)[0];
-        var image_source_url = markdown.match(/http:[^)]+/)[0];
+        var image_source_url = markdown.match(/https:[^)]+/)[0];
         var image            = new Image();
         var base64_image     = null;
 
