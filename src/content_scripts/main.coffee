@@ -359,5 +359,5 @@ $ ->
   decoratePreviewableCommentForm()
 
   # PR画面のタブ切り替えで、アイコンがインサートされない問題の対応
-  $(document).on 'pjax:success', ->
+  $(document).on 'pjax:end', ->
     decoratePreviewableCommentForm()

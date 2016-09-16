@@ -369,7 +369,7 @@ $(function() {
     return new EmojiPallet;
   };
   decoratePreviewableCommentForm();
-  return $(document).on('pjax:success', function() {
+  return $(document).on('pjax:end', function() {
     return decoratePreviewableCommentForm();
   });
 });
