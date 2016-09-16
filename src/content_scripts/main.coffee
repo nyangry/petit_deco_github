@@ -42,7 +42,9 @@ $ ->
 
         $comment_field.focus()
 
-        $current_form.find('button[type=submit]').click()
+        $add_single_comment_button = $current_form.find('button[name=single_comment]')
+
+        $add_single_comment_button.click()
 
 
   class FetchLGTMImage

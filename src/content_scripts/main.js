@@ -37,12 +37,13 @@ $(function() {
     PlusOne.prototype.bindEvents = function() {
       $body.off('click', this.selectors['starter']);
       return $body.on('click', this.selectors['starter'], function(e) {
-        var $comment_field, $current_form;
+        var $add_single_comment_button, $comment_field, $current_form;
         $current_form = $(e.target).parents('form');
         $comment_field = $current_form.find(COMMON_SELECTORS.COMMENT_FIELD);
         $current_form.find(COMMON_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:');
         $comment_field.focus();
-        return $current_form.find('button[type=submit]').click();
+        $add_single_comment_button = $current_form.find('button[name=single_comment]');
+        return $add_single_comment_button.click();
       });
     };
 
