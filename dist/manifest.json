@@ -14,7 +14,7 @@
             "content_scripts/octicons.css"
           ],
           "js": [
-              "content_scripts/app.js"
+            "content_scripts/app.js"
           ]
       }
     ],
