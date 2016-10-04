@@ -177,8 +177,8 @@ $(window).load(function() {
       $self = $(e.currentTarget);
       $current_form = $self.parents('form');
       $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
-      this.$lgtm_selection_panel_node.css('top', $self.offset().top - 220);
-      this.$lgtm_selection_panel_node.css('left', $comment_field.offset().left);
+      this.$lgtm_selection_panel_node.css('top', $self.offset().top - 230);
+      this.$lgtm_selection_panel_node.css('left', $comment_field.offset().left + 100);
       this.$lgtm_selection_panel_backdrop_node.show();
       return this.$lgtm_selection_panel_node.show();
     };

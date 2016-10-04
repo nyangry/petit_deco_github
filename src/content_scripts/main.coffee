@@ -185,8 +185,8 @@ $(window).load ->
       $current_form  = $self.parents 'form'
       $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD)
 
-      @$lgtm_selection_panel_node.css 'top', $self.offset().top - 220
-      @$lgtm_selection_panel_node.css 'left', $comment_field.offset().left
+      @$lgtm_selection_panel_node.css 'top', $self.offset().top - 230
+      @$lgtm_selection_panel_node.css 'left', $comment_field.offset().left + 100
 
       @$lgtm_selection_panel_backdrop_node.show()
       @$lgtm_selection_panel_node.show()
