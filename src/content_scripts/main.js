@@ -32,8 +32,7 @@ $(window).load(function() {
       });
       port.postMessage();
       return port.onMessage.addListener(function(response) {
-        fetched_lgtm_responses.push(response);
-        return console.log(response);
+        return fetched_lgtm_responses.push(response);
       });
     };
 

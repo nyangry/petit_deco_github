@@ -26,7 +26,6 @@ $(window).load ->
 
       port.onMessage.addListener (response) ->
         fetched_lgtm_responses.push response
-        console.log response
 
   class PlusOneAbility
     selectors:
