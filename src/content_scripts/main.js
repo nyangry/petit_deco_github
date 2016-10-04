@@ -1,90 +1,31 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 $(window).load(function() {
-  var $body, AddPetitDecoAbilityToCommentFormOnFocus, CmdEnterBehavior, FetchLGTMImage, GITHUB_SELECTORS, InsertLGTMImageSelectionBackdropAndPanel, LGTMImageSelectionAbility, PETIT_DECO_SELECTORS, PlusOneAbility, decoratePreviewableCommentForm, fetched_lgtm_responses;
+  var $body, AddPetitDecoAbilityToCommentFormOnFocus, BindPetitDecoEvents, CmdEnterBehavior, FetchLGTMImage, GITHUB_SELECTORS, InsertIcons, InsertLGTMImageSelectionBackdropAndPanel, PETIT_DECO_CSS_CLASSES, PETIT_DECO_JS_SELECTORS, decoratePreviewableCommentForm;
   $body = $('body');
   GITHUB_SELECTORS = {
     COMMENT_FIELD: '.js-comment-field',
     TABNAV_TABS: '.tabnav-tabs'
   };
-  PETIT_DECO_SELECTORS = {
+  PETIT_DECO_JS_SELECTORS = {
+    PLUS_ONE: {
+      STARTER: '.js-petit-deco-insert-plus-one'
+    },
     LGTM_SELECTION: {
+      STARTER: '.js-petit-deco-insert-lgtm-selection-panel',
       BACKDROP: '.js-petit-deco-lgtm-selection-panel-backdrop',
       PANEL: '.js-petit-deco-lgtm-selection-panel',
       LGTM_IMAGE: '.js-petit-deco-lgtm-image'
     }
   };
-  fetched_lgtm_responses = [];
-  FetchLGTMImage = (function() {
-    function FetchLGTMImage() {
-      var f, j, len, ref;
-      ref = [this.fetch, this.fetch, this.fetch];
-      for (j = 0, len = ref.length; j < len; j++) {
-        f = ref[j];
-        f();
-      }
+  PETIT_DECO_CSS_CLASSES = {
+    LGTM_SELECTION: {
+      PANEL: 'petit-deco-lgtm-selection-panel',
+      BACKDROP: 'petit-deco-lgtm-selection-backdrop',
+      FLEX_CONTAINER: 'petit-deco-lgtm-selection-flex-container',
+      PANEL_TRIANGLE: 'petit-deco-lgtm-selection-panel-triangle'
     }
-
-    FetchLGTMImage.prototype.fetch = function() {
-      var port;
-      port = chrome.runtime.connect({
-        name: 'petit-deco-github'
-      });
-      port.postMessage();
-      return port.onMessage.addListener(function(response) {
-        return fetched_lgtm_responses.push(response);
-      });
-    };
-
-    return FetchLGTMImage;
-
-  })();
-  PlusOneAbility = (function() {
-    PlusOneAbility.prototype.selectors = {
-      starter: '.js-petit-deco-insert-plus-one'
-    };
-
-    function PlusOneAbility($form) {
-      this.$form = $form;
-      this.insertIcon();
-      this.bindEvents();
-    }
-
-    PlusOneAbility.prototype.insertIcon = function() {
-      var $icon_node, $new_tab;
-      $icon_node = $('<span/>').attr({
-        "class": 'octicon octicon-thumbsup'
-      });
-      $new_tab = $('<div/>').attr({
-        "class": 'tabnav-tab ' + this.selectors['starter'].replace(/\./, ''),
-        style: 'cursor: pointer;'
-      }).append($icon_node);
-      return this.$form.find(GITHUB_SELECTORS.TABNAV_TABS).append($new_tab.clone());
-    };
-
-    PlusOneAbility.prototype.bindEvents = function() {
-      $body.off('click', this.selectors['starter']);
-      return $body.on('click', this.selectors['starter'], function(e) {
-        var $add_single_comment_button, $comment_field, $current_form, $other_submit_button;
-        $current_form = $(e.target).parents('form');
-        $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
-        $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:');
-        $comment_field.focus();
-        $add_single_comment_button = $current_form.find('button[name=single_comment]');
-        if ($add_single_comment_button.length !== 0) {
-          $add_single_comment_button.click();
-          return;
-        }
-        $other_submit_button = $current_form.find("input[type=submit], button[type=submit]").first();
-        if (!$other_submit_button.prop('disabled')) {
-          return $other_submit_button.click();
-        }
-      });
-    };
-
-    return PlusOneAbility;
-
-  })();
+  };
   InsertLGTMImageSelectionBackdropAndPanel = (function() {
     function InsertLGTMImageSelectionBackdropAndPanel() {
       this.insertLGTMSelectionPanelBackdrop();
@@ -94,56 +35,31 @@ $(window).load(function() {
     InsertLGTMImageSelectionBackdropAndPanel.prototype.insertLGTMSelectionPanelBackdrop = function() {
       var $lgtm_selection_panel_backdrop_node;
       $lgtm_selection_panel_backdrop_node = $('<div/>').attr({
-        "class": PETIT_DECO_SELECTORS.LGTM_SELECTION.BACKDROP.replace(/\./, ''),
-        style: 'z-index: 100; display:none; position:fixed; top:0; left:0; width:100%; height:120%;'
+        "class": [PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.BACKDROP.replace(/\./, ''), PETIT_DECO_CSS_CLASSES.LGTM_SELECTION.BACKDROP].join(' ')
       });
       return $lgtm_selection_panel_backdrop_node.appendTo($body);
     };
 
     InsertLGTMImageSelectionBackdropAndPanel.prototype.insertLGTMSelectionPanel = function() {
-      var $lgtm_selection_panel_node, $lgtm_selection_panel_triangle_node;
+      var $lgtm_image_node_base, $lgtm_selection_panel_node, $lgtm_selection_panel_triangle_node;
       $lgtm_selection_panel_node = $('<div/>').attr({
-        "class": PETIT_DECO_SELECTORS.LGTM_SELECTION.PANEL.replace(/\./, '')
+        "class": [PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.PANEL.replace(/\./, ''), PETIT_DECO_CSS_CLASSES.LGTM_SELECTION.PANEL].join(' '),
+        style: 'display: none;'
       });
-      $lgtm_selection_panel_node.css({
-        display: 'none',
-        zIndex: '200',
-        position: 'absolute',
-        cursor: 'pointer',
-        width: '640px',
-        height: '220px',
-        background: '#333',
-        borderRadius: '3px',
-        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.075)'
+      $lgtm_selection_panel_node.append($('<div/>').attr({
+        "class": PETIT_DECO_CSS_CLASSES.LGTM_SELECTION.FLEX_CONTAINER
+      }));
+      $lgtm_image_node_base = $('<img/>').attr({
+        "class": PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.LGTM_IMAGE.replace(/\./, '')
       });
-      $lgtm_selection_panel_node.append($('<img/>').attr({
-        "class": PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE.replace(/\./, ''),
-        style: 'margin: 10px 0 10px 10px;',
-        width: 200,
-        height: 200
-      }));
-      $lgtm_selection_panel_node.append($('<img/>').attr({
-        "class": PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE.replace(/\./, ''),
-        style: 'margin: 10px;',
-        width: 200,
-        height: 200
-      }));
-      $lgtm_selection_panel_node.append($('<img/>').attr({
-        "class": PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE.replace(/\./, ''),
-        style: 'margin: 10px 10px 10px 0px;',
-        width: 200,
-        height: 200
-      }));
-      $lgtm_selection_panel_triangle_node = $('<div/>').css({
-        position: 'absolute',
-        bottom: '-10px',
-        left: '32%',
-        marginLeft: '-13px',
-        width: '0',
-        height: '0',
-        borderTop: '10px solid #333',
-        borderLeft: '10px solid transparent',
-        borderRight: '10px solid transparent'
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_node.find('div').append($lgtm_image_node_base.clone());
+      $lgtm_selection_panel_triangle_node = $('<div/>').attr({
+        "class": PETIT_DECO_CSS_CLASSES.LGTM_SELECTION.PANEL_TRIANGLE
       });
       $lgtm_selection_panel_node.append($lgtm_selection_panel_triangle_node);
       return $lgtm_selection_panel_node.appendTo($body);
@@ -152,78 +68,36 @@ $(window).load(function() {
     return InsertLGTMImageSelectionBackdropAndPanel;
 
   })();
-  LGTMImageSelectionAbility = (function() {
-    LGTMImageSelectionAbility.prototype.selectors = {
-      starter: '.js-petit-deco-insert-lgtm-selection-panel'
-    };
-
-    function LGTMImageSelectionAbility($form) {
-      this.bindEvents = bind(this.bindEvents, this);
-      this.insertIcon = bind(this.insertIcon, this);
-      this.$form = $form;
-      this.insertIcon();
-      this.bindEvents();
+  FetchLGTMImage = (function() {
+    function FetchLGTMImage() {
+      var count;
+      this.$lgtm_images = $(PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.PANEL).find(PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.LGTM_IMAGE);
+      this.port = chrome.runtime.connect({
+        name: 'petit-deco-github'
+      });
+      this.port.onMessage.addListener((function(_this) {
+        return function(response) {
+          return _this.setLGTMimage(response);
+        };
+      })(this));
+      count = 0;
+      while (count < 6) {
+        this.port.postMessage();
+        count++;
+      }
     }
 
-    LGTMImageSelectionAbility.prototype.insertIcon = function() {
-      var $icon_node, $new_tab;
-      $icon_node = $('<span/>').attr({
-        "class": 'octicon octicon-mortar-board'
-      });
-      $new_tab = $('<div/>').attr({
-        "class": 'tabnav-tab ' + this.selectors['starter'].replace(/\./, ''),
-        style: 'cursor: pointer;'
-      }).append($icon_node);
-      return this.$form.find(GITHUB_SELECTORS.TABNAV_TABS).append($new_tab.clone());
-    };
-
-    LGTMImageSelectionAbility.prototype.bindEvents = function() {
-      var $current_form;
-      $current_form = null;
-      $body.off('click', this.selectors['starter']);
-      $body.on('click', this.selectors['starter'], function(e) {
-        var $comment_field, $lgtm_images, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
-        $self = $(e.currentTarget);
-        $current_form = $self.parents('form');
-        $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
-        $lgtm_selection_panel_backdrop_node = $(PETIT_DECO_SELECTORS.LGTM_SELECTION.BACKDROP);
-        $lgtm_selection_panel_node = $(PETIT_DECO_SELECTORS.LGTM_SELECTION.PANEL);
-        $lgtm_selection_panel_node.css('top', $self.offset().top - 220);
-        $lgtm_selection_panel_node.css('left', $comment_field.offset().left);
-        $lgtm_images = $lgtm_selection_panel_node.find(PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE);
-        $lgtm_images.each(function(i, element) {
-          var response;
-          response = fetched_lgtm_responses[i];
-          $(element).data('markdown', response.markdown);
-          return $(element).attr({
-            src: response.base64_image
-          });
-        });
-        $lgtm_selection_panel_backdrop_node.show();
-        return $lgtm_selection_panel_node.show();
-      });
-      $body.off('click', PETIT_DECO_SELECTORS.LGTM_SELECTION.BACKDROP);
-      $body.on('click', PETIT_DECO_SELECTORS.LGTM_SELECTION.BACKDROP, function(e) {
-        var $lgtm_selection_panel_node;
-        $(e.target).hide();
-        $lgtm_selection_panel_node = $(PETIT_DECO_SELECTORS.LGTM_SELECTION.PANEL);
-        return $lgtm_selection_panel_node.hide();
-      });
-      $body.off('click', PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE);
-      return $body.on('click', PETIT_DECO_SELECTORS.LGTM_SELECTION.LGTM_IMAGE, function(e) {
-        var $comment_field, $lgtm_selection_panel_backdrop_node, $lgtm_selection_panel_node, $self;
-        $self = $(e.currentTarget);
-        $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
-        $comment_field.val($comment_field.val() + ' ' + $self.data('markdown'));
-        $lgtm_selection_panel_backdrop_node = $(PETIT_DECO_SELECTORS.LGTM_SELECTION.BACKDROP);
-        $lgtm_selection_panel_backdrop_node.hide();
-        $lgtm_selection_panel_node = $(PETIT_DECO_SELECTORS.LGTM_SELECTION.PANEL);
-        $lgtm_selection_panel_node.hide();
-        return $comment_field.focus();
+    FetchLGTMImage.prototype.setLGTMimage = function(lgtm_image_data) {
+      var $lgtm_image;
+      $lgtm_image = this.$lgtm_images.not('[loaded]').first();
+      $lgtm_image.data('markdown', lgtm_image_data.markdown);
+      return $lgtm_image.attr({
+        loaded: true,
+        src: lgtm_image_data.base64_image
       });
     };
 
-    return LGTMImageSelectionAbility;
+    return FetchLGTMImage;
 
   })();
   CmdEnterBehavior = (function() {
@@ -268,6 +142,99 @@ $(window).load(function() {
     return CmdEnterBehavior;
 
   })();
+  BindPetitDecoEvents = (function() {
+    function BindPetitDecoEvents() {
+      this.lgtmSelectionLGTMImageOnClick = bind(this.lgtmSelectionLGTMImageOnClick, this);
+      this.lgtmSelectionBackdropOnClick = bind(this.lgtmSelectionBackdropOnClick, this);
+      this.lgtmSelectionStarterOnClick = bind(this.lgtmSelectionStarterOnClick, this);
+      this.$lgtm_selection_panel_node = $(PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.PANEL);
+      this.$lgtm_selection_panel_backdrop_node = $(PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.BACKDROP);
+      $body.on('click', PETIT_DECO_JS_SELECTORS.PLUS_ONE.STARTER, this.plusOneStarterOnClick);
+      $body.on('click', PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.STARTER, this.lgtmSelectionStarterOnClick);
+      $body.on('click', PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.BACKDROP, this.lgtmSelectionBackdropOnClick);
+      $body.on('click', PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.LGTM_IMAGE, this.lgtmSelectionLGTMImageOnClick);
+    }
+
+    BindPetitDecoEvents.prototype.plusOneStarterOnClick = function(e) {
+      var $add_single_comment_button, $comment_field, $current_form, $other_submit_button;
+      $current_form = $(e.target).parents('form');
+      $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
+      $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD).val($comment_field.val() + ' :+1:');
+      $comment_field.focus();
+      $add_single_comment_button = $current_form.find('button[name=single_comment]');
+      if ($add_single_comment_button.length !== 0) {
+        $add_single_comment_button.click();
+        return;
+      }
+      $other_submit_button = $current_form.find("input[type=submit], button[type=submit]").first();
+      if (!$other_submit_button.prop('disabled')) {
+        return $other_submit_button.click();
+      }
+    };
+
+    BindPetitDecoEvents.prototype.lgtmSelectionStarterOnClick = function(e) {
+      var $comment_field, $current_form, $self;
+      $self = $(e.currentTarget);
+      $current_form = $self.parents('form');
+      $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
+      this.$lgtm_selection_panel_node.css('top', $self.offset().top - 220);
+      this.$lgtm_selection_panel_node.css('left', $comment_field.offset().left);
+      this.$lgtm_selection_panel_backdrop_node.show();
+      return this.$lgtm_selection_panel_node.show();
+    };
+
+    BindPetitDecoEvents.prototype.lgtmSelectionBackdropOnClick = function(e) {
+      $(e.target).hide();
+      return this.$lgtm_selection_panel_node.hide();
+    };
+
+    BindPetitDecoEvents.prototype.lgtmSelectionLGTMImageOnClick = function(e) {
+      var $comment_field, $self;
+      $self = $(e.currentTarget);
+      $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
+      $comment_field.val($comment_field.val() + ' ' + $self.data('markdown'));
+      this.$lgtm_selection_panel_backdrop_node.hide();
+      this.$lgtm_selection_panel_node.hide();
+      return $comment_field.focus();
+    };
+
+    return BindPetitDecoEvents;
+
+  })();
+  InsertIcons = (function() {
+    function InsertIcons($form) {
+      this.$form = $form;
+      this.insertPlusOneIcon();
+      this.insertLGTMSelectionIcon();
+    }
+
+    InsertIcons.prototype.insertPlusOneIcon = function() {
+      var $icon_node, $new_tab;
+      $icon_node = $('<span/>').attr({
+        "class": 'octicon octicon-thumbsup'
+      });
+      $new_tab = $('<div/>').attr({
+        "class": 'tabnav-tab ' + PETIT_DECO_JS_SELECTORS.PLUS_ONE.STARTER.replace(/\./, ''),
+        style: 'cursor: pointer;'
+      }).append($icon_node);
+      return this.$form.find(GITHUB_SELECTORS.TABNAV_TABS).append($new_tab.clone());
+    };
+
+    InsertIcons.prototype.insertLGTMSelectionIcon = function() {
+      var $icon_node, $new_tab;
+      $icon_node = $('<span/>').attr({
+        "class": 'octicon octicon-mortar-board'
+      });
+      $new_tab = $('<div/>').attr({
+        "class": 'tabnav-tab ' + PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.STARTER.replace(/\./, ''),
+        style: 'cursor: pointer;'
+      }).append($icon_node);
+      return this.$form.find(GITHUB_SELECTORS.TABNAV_TABS).append($new_tab.clone());
+    };
+
+    return InsertIcons;
+
+  })();
   AddPetitDecoAbilityToCommentFormOnFocus = (function() {
     function AddPetitDecoAbilityToCommentFormOnFocus() {
       this.bindEvents();
@@ -283,8 +250,7 @@ $(window).load(function() {
       if ($form.attr('petit_deco_ability') != null) {
         return;
       }
-      new PlusOneAbility($form);
-      new LGTMImageSelectionAbility($form);
+      new InsertIcons($form);
       return $form.attr({
         petit_deco_ability: true
       });
@@ -297,10 +263,11 @@ $(window).load(function() {
     if ($.inArray($('meta[name="selected-link"]').attr('value'), ['repo_pulls', 'repo_issues']) === -1) {
       return;
     }
-    new FetchLGTMImage;
     new InsertLGTMImageSelectionBackdropAndPanel;
-    new AddPetitDecoAbilityToCommentFormOnFocus;
-    return new CmdEnterBehavior;
+    new FetchLGTMImage;
+    new CmdEnterBehavior;
+    new BindPetitDecoEvents;
+    return new AddPetitDecoAbilityToCommentFormOnFocus;
   };
   return decoratePreviewableCommentForm();
 });
