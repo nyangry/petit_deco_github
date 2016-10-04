@@ -1,0 +1,50 @@
+.petit-deco-lgtm-selection-backdrop {
+  z-index: 100;
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:120%;
+}
+
+.petit-deco-lgtm-selection-panel {
+  display: none;
+  z-index: 200;
+  position: absolute;
+}
+
+.petit-deco-lgtm-selection-flex-container {
+  cursor: pointer;
+  width: 350px;
+  height: 230px;
+  background: #333;
+  border-radius: 3px;
+  /* box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); */
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.petit-deco-lgtm-selection-flex-container img {
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+
+  background: url('chrome-extension://__MSG_@@extension_id__/content_scripts/loader.gif');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.petit-deco-lgtm-selection-panel-triangle {
+  position: absolute;
+  bottom: -10px;
+  left: 32%;
+  margin-left: -13px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #333;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}

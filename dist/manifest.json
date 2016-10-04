@@ -11,6 +11,7 @@
             "https://github.com/*"
           ],
           "css": [
+            "content_scripts/app.css",
             "content_scripts/octicons.css"
           ],
           "js": [
@@ -35,6 +36,7 @@
     ],
 
     "web_accessible_resources": [
+      "content_scripts/loader.gif",
       "content_scripts/*.eot",
       "content_scripts/*.woff",
       "content_scripts/*.ttf",
