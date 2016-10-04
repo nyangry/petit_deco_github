@@ -179,6 +179,9 @@ $(window).load(function() {
       $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
       this.$lgtm_selection_panel_node.css('top', $self.offset().top - 230);
       this.$lgtm_selection_panel_node.css('left', $comment_field.offset().left + 100);
+      this.$lgtm_selection_panel_node.attr({
+        comment_field_id: '#' + $comment_field.attr('id')
+      });
       this.$lgtm_selection_panel_backdrop_node.show();
       return this.$lgtm_selection_panel_node.show();
     };
@@ -189,9 +192,10 @@ $(window).load(function() {
     };
 
     BindPetitDecoEvents.prototype.lgtmSelectionLGTMImageOnClick = function(e) {
-      var $comment_field, $self;
+      var $comment_field, $lgtm_panel, $self;
       $self = $(e.currentTarget);
-      $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD);
+      $lgtm_panel = $self.parents(PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.PANEL);
+      $comment_field = $($lgtm_panel.attr('comment_field_id'));
       $comment_field.val($comment_field.val() + ' ' + $self.data('markdown'));
       this.$lgtm_selection_panel_backdrop_node.hide();
       this.$lgtm_selection_panel_node.hide();

@@ -180,13 +180,15 @@ $(window).load ->
         $other_submit_button.click()
 
     lgtmSelectionStarterOnClick: (e) =>
-      $self = $(e.currentTarget)
-
+      $self          = $(e.currentTarget)
       $current_form  = $self.parents 'form'
       $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD)
 
       @$lgtm_selection_panel_node.css 'top', $self.offset().top - 230
       @$lgtm_selection_panel_node.css 'left', $comment_field.offset().left + 100
+
+      @$lgtm_selection_panel_node.attr
+        comment_field_id: '#' + $comment_field.attr 'id'
 
       @$lgtm_selection_panel_backdrop_node.show()
       @$lgtm_selection_panel_node.show()
@@ -197,9 +199,9 @@ $(window).load ->
       @$lgtm_selection_panel_node.hide()
 
     lgtmSelectionLGTMImageOnClick: (e) =>
-      $self = $(e.currentTarget)
-
-      $comment_field = $current_form.find(GITHUB_SELECTORS.COMMENT_FIELD)
+      $self          = $(e.currentTarget)
+      $lgtm_panel    = $self.parents PETIT_DECO_JS_SELECTORS.LGTM_SELECTION.PANEL
+      $comment_field = $($lgtm_panel.attr('comment_field_id'))
 
       $comment_field.val $comment_field.val() + ' ' + $self.data('markdown')
 
