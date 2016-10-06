@@ -4,6 +4,7 @@ $(window).load ->
   GITHUB_SELECTORS =
     COMMENT_FIELD: '.js-comment-field'
     TABNAV_TABS: '.tabnav-tabs'
+    CURRENT_BRANCH: '.current-branch'
 
   PETIT_DECO_JS_SELECTORS = {
     PLUS_ONE:
@@ -97,7 +98,7 @@ $(window).load ->
 
     bindEvents: ->
       # textarea の動的な追加に対応する
-      $(document).on 'click', '.js-add-single-line-comment', @onClick
+      $body.on 'click', '.js-add-single-line-comment', @onClick
 
       # GitHub のデフォルトの挙動を上書きする
       #
@@ -106,7 +107,7 @@ $(window).load ->
       #   i = n.find("input[type=submit], button[type=submit]").first(),
       #   i.prop("disabled") || n.submit(),
       #   !1) : void 0
-      $('.js-quick-submit').on 'keydown', @onKeydown
+      $body.on 'keydonw', '.js-quick-submit', @onKeydown
 
     onClick: (e) =>
       $inserted_tr = $(e.target).closest('tr').next()
@@ -140,6 +141,26 @@ $(window).load ->
 
       unless $other_submit_button.prop 'disabled'
         $other_submit_button.click()
+
+  class DecorateTruncateTargetTextAsLink
+    constructor: ->
+      $current_branch_texts = $body.find GITHUB_SELECTORS.CURRENT_BRANCH
+
+      return if $current_branch_texts.length is 0
+
+      $current_branch_texts.each ->
+        $current_branch_text = $(@)
+
+        $replacement = $('<a>').html($current_branch_text.html()).attr
+          href: [
+            'https://',
+            location.host,
+            '/',
+            $current_branch_text.attr('title').replace(/:/, '/tree/')
+          ].join('')
+          target: '_new'
+
+        $current_branch_text.html $replacement
 
   class BindPetitDecoEvents
     constructor: ->
@@ -274,6 +295,9 @@ $(window).load ->
     new FetchLGTMImage
 
     new CmdEnterBehavior
+
+    # PR画面のリボジトリ・ブランチ名部分を当該リポジトリ・ブランチへのリンクに差し替える
+    new DecorateTruncateTargetTextAsLink
 
     new BindPetitDecoEvents
 

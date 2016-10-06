@@ -1,11 +1,12 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 $(window).load(function() {
-  var $body, AddPetitDecoAbilityToCommentFormOnFocus, BindPetitDecoEvents, CmdEnterBehavior, FetchLGTMImage, GITHUB_SELECTORS, InsertIcons, InsertLGTMImageSelectionBackdropAndPanel, PETIT_DECO_CSS_CLASSES, PETIT_DECO_JS_SELECTORS, decoratePreviewableCommentForm;
+  var $body, AddPetitDecoAbilityToCommentFormOnFocus, BindPetitDecoEvents, CmdEnterBehavior, DecorateTruncateTargetTextAsLink, FetchLGTMImage, GITHUB_SELECTORS, InsertIcons, InsertLGTMImageSelectionBackdropAndPanel, PETIT_DECO_CSS_CLASSES, PETIT_DECO_JS_SELECTORS, decoratePreviewableCommentForm;
   $body = $('body');
   GITHUB_SELECTORS = {
     COMMENT_FIELD: '.js-comment-field',
-    TABNAV_TABS: '.tabnav-tabs'
+    TABNAV_TABS: '.tabnav-tabs',
+    CURRENT_BRANCH: '.current-branch'
   };
   PETIT_DECO_JS_SELECTORS = {
     PLUS_ONE: {
@@ -107,8 +108,8 @@ $(window).load(function() {
     }
 
     CmdEnterBehavior.prototype.bindEvents = function() {
-      $(document).on('click', '.js-add-single-line-comment', this.onClick);
-      return $('.js-quick-submit').on('keydown', this.onKeydown);
+      $body.on('click', '.js-add-single-line-comment', this.onClick);
+      return $body.on('keydonw', '.js-quick-submit', this.onKeydown);
     };
 
     CmdEnterBehavior.prototype.onClick = function(e) {
@@ -140,6 +141,27 @@ $(window).load(function() {
     };
 
     return CmdEnterBehavior;
+
+  })();
+  DecorateTruncateTargetTextAsLink = (function() {
+    function DecorateTruncateTargetTextAsLink() {
+      var $current_branch_texts;
+      $current_branch_texts = $body.find(GITHUB_SELECTORS.CURRENT_BRANCH);
+      if ($current_branch_texts.length === 0) {
+        return;
+      }
+      $current_branch_texts.each(function() {
+        var $current_branch_text, $replacement;
+        $current_branch_text = $(this);
+        $replacement = $('<a>').html($current_branch_text.html()).attr({
+          href: ['https://', location.host, '/', $current_branch_text.attr('title').replace(/:/, '/tree/')].join(''),
+          target: '_new'
+        });
+        return $current_branch_text.html($replacement);
+      });
+    }
+
+    return DecorateTruncateTargetTextAsLink;
 
   })();
   BindPetitDecoEvents = (function() {
@@ -270,6 +292,7 @@ $(window).load(function() {
     new InsertLGTMImageSelectionBackdropAndPanel;
     new FetchLGTMImage;
     new CmdEnterBehavior;
+    new DecorateTruncateTargetTextAsLink;
     new BindPetitDecoEvents;
     return new AddPetitDecoAbilityToCommentFormOnFocus;
   };
