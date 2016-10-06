@@ -6,7 +6,9 @@ $(window).load(function() {
   GITHUB_SELECTORS = {
     COMMENT_FIELD: '.js-comment-field',
     TABNAV_TABS: '.tabnav-tabs',
-    CURRENT_BRANCH: '.current-branch'
+    CURRENT_BRANCH: '.current-branch',
+    QUICK_SUBMIT: '.js-quick-submit',
+    DISMISS_REVIEW_TUTORIAL: '.js-dismiss-review-tutorial'
   };
   PETIT_DECO_JS_SELECTORS = {
     PLUS_ONE: {
@@ -103,32 +105,32 @@ $(window).load(function() {
   })();
   CmdEnterBehavior = (function() {
     function CmdEnterBehavior() {
-      this.onClick = bind(this.onClick, this);
+      this.onFocusin = bind(this.onFocusin, this);
       this.bindEvents();
     }
 
     CmdEnterBehavior.prototype.bindEvents = function() {
-      $body.on('click', '.js-add-single-line-comment', this.onClick);
-      return $body.on('keydonw', '.js-quick-submit', this.onKeydown);
+      $body.on('focusin', GITHUB_SELECTORS.QUICK_SUBMIT, this.onFocusin);
+      return $body.on('focusout', GITHUB_SELECTORS.QUICK_SUBMIT, this.onFocusout);
     };
 
-    CmdEnterBehavior.prototype.onClick = function(e) {
-      var $cloned_textarea, $inserted_tr, $textarea;
-      $inserted_tr = $(e.target).closest('tr').next();
-      $textarea = $inserted_tr.find('.js-quick-submit');
-      $cloned_textarea = $textarea.clone();
-      $textarea.after($cloned_textarea);
-      $textarea.remove();
-      $cloned_textarea.on('keydown', this.onKeydown);
-      return $cloned_textarea.focus();
+    CmdEnterBehavior.prototype.onFocusin = function(e) {
+      return $(e.target).on('keydown', this.onKeydown);
+    };
+
+    CmdEnterBehavior.prototype.onFocusout = function(e) {
+      return $(e.target).off('keydown');
     };
 
     CmdEnterBehavior.prototype.onKeydown = function(e) {
       var $add_single_comment_button, $form, $other_submit_button;
+      $form = $(e.target.form);
+      $form.find(GITHUB_SELECTORS.DISMISS_REVIEW_TUTORIAL).prop('disabled', true);
       if (!(e.keyCode === 13 && e.metaKey)) {
         return;
       }
-      $form = $(e.target.form);
+      e.preventDefault();
+      e.stopPropagation();
       $add_single_comment_button = $form.find('button[name=single_comment]');
       if ($add_single_comment_button.length !== 0) {
         $add_single_comment_button.click();

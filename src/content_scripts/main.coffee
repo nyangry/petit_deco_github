@@ -5,6 +5,8 @@ $(window).load ->
     COMMENT_FIELD: '.js-comment-field'
     TABNAV_TABS: '.tabnav-tabs'
     CURRENT_BRANCH: '.current-branch'
+    QUICK_SUBMIT: '.js-quick-submit'
+    DISMISS_REVIEW_TUTORIAL: '.js-dismiss-review-tutorial'
 
   PETIT_DECO_JS_SELECTORS = {
     PLUS_ONE:
@@ -97,36 +99,75 @@ $(window).load ->
       @bindEvents()
 
     bindEvents: ->
-      # textarea の動的な追加に対応する
-      $body.on 'click', '.js-add-single-line-comment', @onClick
-
-      # GitHub のデフォルトの挙動を上書きする
+      # GitHub のデフォルトの挙動を上書きするのが困難なので、
+      # - mouseover で focusin より先に keydown イベントを仕込む
+      # - button.js-dismiss-review-tutorial の prop を disable にする
+      # というアプローチでいく
       #
       # GitHub's CODE:
-      #   return "ctrl+enter" === t.hotkey || "meta+enter" === t.hotkey ? (n = e(this).closest("form"),
-      #   i = n.find("input[type=submit], button[type=submit]").first(),
-      #   i.prop("disabled") || n.submit(),
-      #   !1) : void 0
-      $body.on 'keydonw', '.js-quick-submit', @onKeydown
+      #   function() {
+      #     var e = require("github/jquery")["default"]
+      #       , t = require("github/focused")
+      #       , i = t.onFocusedKeydown;
+      #     i(document, ".js-quick-submit", function() {
+      #       return function(t) {
+      #         var i = void 0
+      #           , n = void 0;
+      #         return "ctrl+enter" === t.hotkey || "meta+enter" === t.hotkey ? (n = e(this).closest("form"),
+      #         i = n.find("input[type=submit], button[type=submit]").first(),
+      #         i.prop("disabled") || n.submit(),
+      #         !1) : void 0
+      #       }
+      #     })
+      #   }()
+      #
+      #   function r(e, t, n) {
+      #     var r = n.focusin
+      #       , o = n.focusout
+      #       , i = void 0;
+      #     i = t ? a["default"](e).find(t).filter(document.activeElement)[0] : a["default"](e).filter(document.activeElement)[0],
+      #     i && r && r.call(i),
+      #     a["default"](e).on("focusin", t, function() {
+      #       i || (i = this,
+      #       r && r.call(this))
+      #     }),
+      #     a["default"](e).on("focusout", t, function() {
+      #       i && (i = null ,
+      #       o && o.call(this))
+      #     })
+      #   }
+      #   function o(e, t, n) {
+      #     var o = "focusKeydown" + Math.floor(1e3 * Math.random());
+      #     r(e, t, {
+      #       focusin: function() {
+      #         var e = n.call(this, o);
+      #         e && a["default"](this).on("keydown." + o, e)
+      #       },
+      #       focusout: function() {
+      #         a["default"](this).off("." + o)
+      #       }
+      #     })
+      #   }
+      # $body.on 'mouseover', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusin
+      $body.on 'focusin', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusin
+      # $body.on 'mouseout', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusout
+      $body.on 'focusout', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusout
 
-    onClick: (e) =>
-      $inserted_tr = $(e.target).closest('tr').next()
+    onFocusin: (e) =>
+      $(e.target).on 'keydown', @onKeydown
 
-      # textarea イベントを削ぎ落とすために、Node を clone して、差し替える
-      $textarea        = $inserted_tr.find('.js-quick-submit')
-      $cloned_textarea = $textarea.clone()
-
-      $textarea.after $cloned_textarea
-      $textarea.remove()
-
-      $cloned_textarea.on 'keydown', @onKeydown
-
-      $cloned_textarea.focus()
+    onFocusout: (e) ->
+      $(e.target).off 'keydown'
 
     onKeydown: (e) ->
+      $form = $(e.target.form)
+
+      $form.find(GITHUB_SELECTORS.DISMISS_REVIEW_TUTORIAL).prop 'disabled', true
+
       return unless (e.keyCode == 13 and e.metaKey)
 
-      $form = $(e.target.form)
+      e.preventDefault()
+      e.stopPropagation()
 
       # Add single comment ボタンを探してみて、見つかれば click event を発火させる
       $add_single_comment_button = $form.find('button[name=single_comment]')
