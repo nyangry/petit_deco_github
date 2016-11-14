@@ -8,3 +8,13 @@
     "limitComments": true
   }
 }
+{
+  "no_implicit_parens": {
+    "level": "ignore"
+  },
+  "max_line_length": {
+    "value": 140,
+    "level": "ignore",
+    "limitComments": true
+  }
+}
