@@ -8,8 +8,8 @@ chrome.runtime.onConnect.addListener(function(port) {
     get_json_request.onload = function() {
       if (get_json_request.status >= 200 && get_json_request.status < 400) {
         var data             = JSON.parse(get_json_request.responseText);
-        var markdown         = data.markdown.match(/!\[LGTM\]\(.*?\)/)[0];
-        var image_source_url = markdown.match(/https:[^)]+/)[0];
+        var image_source_url = data.actualImageUrl;
+        var markdown         = `![](${image_source_url})`;
         var image            = new Image();
         var base64_image     = null;
 
