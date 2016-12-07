@@ -115,31 +115,20 @@ $(window).load(function() {
     };
 
     CmdEnterBehavior.prototype.onFocusin = function(e) {
-      return $(e.target).on('keydown', this.onKeydown);
+      var $add_single_comment_button, $form;
+      $form = $(e.target.form);
+      $add_single_comment_button = $form.find('button[name=single_comment]');
+      if ($add_single_comment_button.length !== 0) {
+        return $form.append($('<input>').attr({
+          type: 'hidden',
+          name: 'single_comment',
+          value: 1
+        }));
+      }
     };
 
     CmdEnterBehavior.prototype.onFocusout = function(e) {
-      return $(e.target).off('keydown');
-    };
-
-    CmdEnterBehavior.prototype.onKeydown = function(e) {
-      var $add_single_comment_button, $form, $other_submit_button;
-      $form = $(e.target.form);
-      $form.find(GITHUB_SELECTORS.DISMISS_REVIEW_TUTORIAL).prop('disabled', true);
-      if (!(e.keyCode === 13 && e.metaKey)) {
-        return;
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      $add_single_comment_button = $form.find('button[name=single_comment]');
-      if ($add_single_comment_button.length !== 0) {
-        $add_single_comment_button.click();
-        return;
-      }
-      $other_submit_button = $form.find("input[type=submit], button[type=submit]").first();
-      if (!$other_submit_button.prop('disabled')) {
-        return $other_submit_button.click();
-      }
+      return $(e.target.form).find('[type=hidden][name=single_comment]').remove();
     };
 
     return CmdEnterBehavior;

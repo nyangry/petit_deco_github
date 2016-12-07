@@ -99,89 +99,28 @@ $(window).load ->
       @bindEvents()
 
     bindEvents: ->
-      # GitHub のデフォルトの挙動を上書きするのが困難なので、
-      # - mouseover で focusin より先に keydown イベントを仕込む
-      # - button.js-dismiss-review-tutorial の prop を disable にする
-      # というアプローチでいく
-      #
-      # GitHub's CODE:
-      #   function() {
-      #     var e = require("github/jquery")["default"]
-      #       , t = require("github/focused")
-      #       , i = t.onFocusedKeydown;
-      #     i(document, ".js-quick-submit", function() {
-      #       return function(t) {
-      #         var i = void 0
-      #           , n = void 0;
-      #         return "ctrl+enter" === t.hotkey || "meta+enter" === t.hotkey ? (n = e(this).closest("form"),
-      #         i = n.find("input[type=submit], button[type=submit]").first(),
-      #         i.prop("disabled") || n.submit(),
-      #         !1) : void 0
-      #       }
-      #     })
-      #   }()
-      #
-      #   function r(e, t, n) {
-      #     var r = n.focusin
-      #       , o = n.focusout
-      #       , i = void 0;
-      #     i = t ? a["default"](e).find(t).filter(document.activeElement)[0] : a["default"](e).filter(document.activeElement)[0],
-      #     i && r && r.call(i),
-      #     a["default"](e).on("focusin", t, function() {
-      #       i || (i = this,
-      #       r && r.call(this))
-      #     }),
-      #     a["default"](e).on("focusout", t, function() {
-      #       i && (i = null ,
-      #       o && o.call(this))
-      #     })
-      #   }
-      #   function o(e, t, n) {
-      #     var o = "focusKeydown" + Math.floor(1e3 * Math.random());
-      #     r(e, t, {
-      #       focusin: function() {
-      #         var e = n.call(this, o);
-      #         e && a["default"](this).on("keydown." + o, e)
-      #       },
-      #       focusout: function() {
-      #         a["default"](this).off("." + o)
-      #       }
-      #     })
-      #   }
-      # $body.on 'mouseover', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusin
       $body.on 'focusin', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusin
-      # $body.on 'mouseout', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusout
       $body.on 'focusout', GITHUB_SELECTORS.QUICK_SUBMIT, @onFocusout
 
+    # Add single comment ボタンが存在するフォームであれば、
+    # cmd+enter のデフォルトの挙動を、Add single comment にするために、
+    # focusin の時点で、
+    # hidden で single_comment 化するパラメータを埋め込んでおく
     onFocusin: (e) =>
-      $(e.target).on 'keydown', @onKeydown
-
-    onFocusout: (e) ->
-      $(e.target).off 'keydown'
-
-    onKeydown: (e) ->
       $form = $(e.target.form)
 
-      $form.find(GITHUB_SELECTORS.DISMISS_REVIEW_TUTORIAL).prop 'disabled', true
-
-      return unless (e.keyCode == 13 and e.metaKey)
-
-      e.preventDefault()
-      e.stopPropagation()
-
-      # Add single comment ボタンを探してみて、見つかれば click event を発火させる
       $add_single_comment_button = $form.find('button[name=single_comment]')
 
       if $add_single_comment_button.length isnt 0
-        $add_single_comment_button.click()
+        $form.append $('<input>').attr
+          type: 'hidden'
+          name: 'single_comment'
+          value: 1
 
-        return
-
-      # Add single comment ボタンが見つからなかった場合、他の submit ボタンが disabled でなければ、click event を発火させる
-      $other_submit_button = $form.find("input[type=submit], button[type=submit]").first()
-
-      unless $other_submit_button.prop 'disabled'
-        $other_submit_button.click()
+    # focusin で埋め込んだ hidden パラメータがあれば、削除しておく
+    # この挙動により、Start a review ボタンを押下した際は、通常のレビューモードとなる
+    onFocusout: (e) ->
+      $(e.target.form).find('[type=hidden][name=single_comment]').remove()
 
   class DecorateTruncateTargetTextAsLink
     constructor: ->
