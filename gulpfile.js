@@ -1,24 +1,15 @@
 var gulp   = require('gulp');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
-var coffee = require('gulp-coffee');
 var gutil  = require('gulp-util');
 
 // default task
-gulp.task('default', ['coffee', 'dist_js', 'octicons'], function () {
-  gulp.watch('src/content_scripts/*.coffee', ['dist_js']);
-});
-
-// compile coffee to js
-gulp.task('coffee', function() {
-  // return することで実行順序を保証
-  return gulp.src('src/content_scripts/*.coffee')
-    .pipe(coffee({bare: true}))
-    .pipe(gulp.dest('src/content_scripts/'));
+gulp.task('default', ['dist_js'], function () {
+  gulp.watch('src/content_scripts/*.js', ['dist_js']);
 });
 
 // minify and concat content_scripts js
-gulp.task('dist_js', ['coffee'], function() {
+gulp.task('dist_js', function() {
   gulp
     .src([
       './node_modules/jquery/dist/jquery.min.js',
@@ -29,17 +20,4 @@ gulp.task('dist_js', ['coffee'], function() {
     }).on('error', gutil.log))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('dist/content_scripts'));
-});
-
-// octicons
-gulp.task('octicons', function() {
-  gulp
-    .src([
-      './node_modules/octicons/octicons/octicons.css',
-      './node_modules/octicons/octicons/octicons.eot',
-      './node_modules/octicons/octicons/octicons.woff',
-      './node_modules/octicons/octicons/octicons.ttf',
-      './node_modules/octicons/octicons/octicons.svg'
-    ])
-    .pipe(gulp.dest('dist/content_scripts/'));
 });
