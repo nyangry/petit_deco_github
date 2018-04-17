@@ -1,7 +1,6 @@
 var gulp   = require('gulp');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
-var gutil  = require('gulp-util');
 
 // default task
 gulp.task('default', ['dist_js'], function () {
@@ -16,7 +15,7 @@ gulp.task('dist_js', function() {
     ])
     .pipe(uglify({
       preserveComments: 'license'
-    }).on('error', gutil.log))
+    }))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('dist/content_scripts'));
 });
