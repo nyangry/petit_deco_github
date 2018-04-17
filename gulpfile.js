@@ -12,7 +12,6 @@ gulp.task('default', ['dist_js'], function () {
 gulp.task('dist_js', function() {
   gulp
     .src([
-      './node_modules/jquery/dist/jquery.min.js',
       './src/content_scripts/*.js',
     ])
     .pipe(uglify({
