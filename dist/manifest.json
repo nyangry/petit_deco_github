@@ -1,5 +1,5 @@
 {
-    "version": "0.7.0",
+    "version": "1.0.0",
     "manifest_version": 2,
 
     "name": "petit_deco_github",
@@ -11,8 +11,7 @@
             "https://github.com/*"
           ],
           "css": [
-            "content_scripts/app.css",
-            "content_scripts/octicons.css"
+            "content_scripts/app.css"
           ],
           "js": [
             "content_scripts/app.js"
@@ -26,7 +25,7 @@
     },
 
     "externally_connectable": {
-      "matches": [ "*://*.github.com/*" ]
+      "matches": [ "*://*.github.com/*", "*://github.com/*" ]
     },
 
     "permissions": [
@@ -36,10 +35,6 @@
     ],
 
     "web_accessible_resources": [
-      "content_scripts/loader.gif",
-      "content_scripts/*.eot",
-      "content_scripts/*.woff",
-      "content_scripts/*.ttf",
-      "content_scripts/*.svg"
+      "content_scripts/loader.gif"
     ]
 }
