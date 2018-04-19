@@ -16,11 +16,11 @@
 
 .petit-deco-lgtm-selection-flex-container {
   cursor: pointer;
-  width: 350px;
+  width: 340px;
   height: 230px;
-  background: rgba(51,51,51,0.75);
+  background: #19293a;
   border-radius: 3px;
-  /* box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); */
+  /* box-shadow: inset 0 1px 2px #19293a; */
   align-content: center;
   display: flex;
   flex-wrap: wrap;
@@ -44,7 +44,7 @@
   margin-left: -13px;
   width: 0;
   height: 0;
-  border-top: 10px solid rgba(51,51,51,0.75);
+  border-top: 10px solid #19293a;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
 }
