@@ -5,6 +5,10 @@
     "name": "petit_deco_github",
     "description": "petit decoration chrome extension on github.",
 
+    "icons": {
+      "128": "icon_128.png"
+    },
+
     "content_scripts": [
       {
           "matches": [
