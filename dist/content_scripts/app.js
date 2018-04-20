@@ -46,24 +46,6 @@
       app_elements.$lgtm_images                   = document.querySelectorAll(APP_SELECTORS.LGTM_IMAGES)
     }
 
-    // fetch lgtm images
-    {
-      let port = chrome.runtime.connect({name: 'petit-deco-github'})
-
-      // define callback
-      port.onMessage.addListener(function(response) {
-        let $lgtm_image = app_elements.$lgtm_images[response.lgtm_image_index]
-
-        $lgtm_image.dataset.markdown = response.markdown
-        $lgtm_image.setAttribute('loaded', true)
-        $lgtm_image.setAttribute('src', response.base64_image)
-      })
-
-      for (let index = 0; index < app_elements.$lgtm_images.length; index++) {
-        port.postMessage(index)
-      }
-    }
-
     // Set Event Listeners
     {
       app_elements.$lgtm_images.forEach($lgtm_image => {
@@ -83,6 +65,24 @@
         app_elements.$lgtm_selection_panel_backdrop.style.display = 'none'
         app_elements.$lgtm_selection_panel.style.display = 'none'
       })
+    }
+  }
+
+  // fetch lgtm images
+  const fetchLgtmImages = () => {
+    let port = chrome.runtime.connect({name: 'petit-deco-github'})
+
+    // define callback
+    port.onMessage.addListener(function(response) {
+      let $lgtm_image = app_elements.$lgtm_images[response.lgtm_image_index]
+
+      $lgtm_image.dataset.markdown = response.markdown
+      $lgtm_image.setAttribute('loaded', true)
+      $lgtm_image.setAttribute('src', response.base64_image)
+    })
+
+    for (let index = 0; index < app_elements.$lgtm_images.length; index++) {
+      port.postMessage(index)
     }
   }
 
@@ -117,6 +117,17 @@
     // Set Event Listeners
     {
       app_elements.$lgtm_selection_starter.addEventListener('click', (e) => {
+
+        // refetch lgtm images
+        {
+          app_elements.$lgtm_images.forEach(($img) => {
+            $img.setAttribute('alt', '')
+            $img.removeAttribute('src')
+          })
+
+          fetchLgtmImages()
+        }
+
         let $self = e.currentTarget
 
         let scroll_top = window.pageYOffset || document.documentElement.scrollTop
