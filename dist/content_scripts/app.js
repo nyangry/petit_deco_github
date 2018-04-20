@@ -63,6 +63,27 @@
         port.postMessage(index)
       }
     }
+
+    // Set Event Listeners
+    {
+      app_elements.$lgtm_images.forEach($lgtm_image => {
+        $lgtm_image.addEventListener('click', (e) => {
+          let $self = e.currentTarget
+
+          github_elements.$new_comment_field.value = github_elements.$new_comment_field.value + '\n' + $self.dataset.markdown
+
+          app_elements.$lgtm_selection_panel_backdrop.style.display = 'none'
+          app_elements.$lgtm_selection_panel.style.display = 'none'
+
+          github_elements.$new_comment_field.focus()
+        })
+      })
+
+      app_elements.$lgtm_selection_panel_backdrop.addEventListener('click', () => {
+        app_elements.$lgtm_selection_panel_backdrop.style.display = 'none'
+        app_elements.$lgtm_selection_panel.style.display = 'none'
+      })
+    }
   }
 
   const insertDecos = () => {
@@ -93,51 +114,31 @@
       app_elements.$quick_plus_one_button = document.querySelector(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON)
     }
 
-    setEventListeners()
-  }
-
-  // Set Event Listeners
-  const setEventListeners = () => {
-    app_elements.$lgtm_selection_starter.addEventListener('click', (e) => {
-      let $self = e.currentTarget
-
-      let scroll_top = window.pageYOffset || document.documentElement.scrollTop
-      let scroll_left = window.pageXOffset || document.documentElement.scrollLeft
-
-      let self_rect = $self.getBoundingClientRect()
-      let new_comment_field_rect = github_elements.$new_comment_field.getBoundingClientRect()
-
-      let self_top = self_rect.top + scroll_top
-      let new_comment_field_left = new_comment_field_rect.left + scroll_left
-
-      app_elements.$lgtm_selection_panel.style.top = self_top - 245 + 'px'
-      app_elements.$lgtm_selection_panel.style.left = new_comment_field_left + 170 + 'px'
-
-      app_elements.$lgtm_selection_panel_backdrop.style.display = 'block'
-      app_elements.$lgtm_selection_panel.style.display = 'block'
-    })
-
-    app_elements.$lgtm_images.forEach($lgtm_image => {
-      $lgtm_image.addEventListener('click', (e) => {
+    // Set Event Listeners
+    {
+      app_elements.$lgtm_selection_starter.addEventListener('click', (e) => {
         let $self = e.currentTarget
 
-        github_elements.$new_comment_field.value = github_elements.$new_comment_field.value + '\n' + $self.dataset.markdown
+        let scroll_top = window.pageYOffset || document.documentElement.scrollTop
+        let scroll_left = window.pageXOffset || document.documentElement.scrollLeft
 
-        app_elements.$lgtm_selection_panel_backdrop.style.display = 'none'
-        app_elements.$lgtm_selection_panel.style.display = 'none'
+        let self_rect = $self.getBoundingClientRect()
+        let new_comment_field_rect = github_elements.$new_comment_field.getBoundingClientRect()
 
-        github_elements.$new_comment_field.focus()
+        let self_top = self_rect.top + scroll_top
+        let new_comment_field_left = new_comment_field_rect.left + scroll_left
+
+        app_elements.$lgtm_selection_panel.style.top = self_top - 245 + 'px'
+        app_elements.$lgtm_selection_panel.style.left = new_comment_field_left + 170 + 'px'
+
+        app_elements.$lgtm_selection_panel_backdrop.style.display = 'block'
+        app_elements.$lgtm_selection_panel.style.display = 'block'
       })
-    })
 
-    app_elements.$lgtm_selection_panel_backdrop.addEventListener('click', () => {
-      app_elements.$lgtm_selection_panel_backdrop.style.display = 'none'
-      app_elements.$lgtm_selection_panel.style.display = 'none'
-    })
-
-    app_elements.$quick_plus_one_button.addEventListener('click', () => {
-      github_elements.$new_comment_field.value = ':+1:'
-    })
+      app_elements.$quick_plus_one_button.addEventListener('click', () => {
+        github_elements.$new_comment_field.value = ':+1:'
+      })
+    }
   }
 
   // Observe Mutation
@@ -151,7 +152,7 @@
             }
 
             insertDecos()
-          }, 500)
+          }, 1000)
         })
       })
     })
