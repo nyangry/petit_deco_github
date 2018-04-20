@@ -1,26 +1,27 @@
 {
   // define github selectors
   const GITHUB_SELECTORS = {}
-  GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID = '#new_comment_field'
+  GITHUB_SELECTORS.PJAX_CONTAINER_ID      = '#js-repo-pjax-container'
+  GITHUB_SELECTORS.CONVERSATION_BUCKET_ID = '#discussion_bucket'
+  GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID   = '#new_comment_field'
 
   // define github elements
   const github_elements = {}
-  github_elements.$new_comment_field = document.querySelector(GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID)
-  github_elements.$nav_above_new_comment_field = github_elements.$new_comment_field.closest('form').querySelectorAll('nav').item(0)
+  github_elements.$pjax_container = document.querySelector(GITHUB_SELECTORS.PJAX_CONTAINER_ID)
 
   // define app selectors
   const APP_SELECTORS = {}
-  APP_SELECTORS.LGTM_IMAGES = '.js-petit-deco-lgtm-image'
+  APP_SELECTORS.LGTM_IMAGES                   = '.js-petit-deco-lgtm-image'
   APP_SELECTORS.LGTM_SELECTION_PANEL_BACKDROP = '.js-petit-deco-lgtm-selection-panel-backdrop'
-  APP_SELECTORS.LGTM_SELECTION_PANEL = '.js-petit-deco-lgtm-selection-panel'
-  APP_SELECTORS.LGTM_SELECTION_STARTER = '.js-petit-deco-lgtm-selection-starter'
-  APP_SELECTORS.QUICK_PLUS_ONE_BUTTON = '.js-petit-deco-quick-plus-one-button'
+  APP_SELECTORS.LGTM_SELECTION_PANEL          = '.js-petit-deco-lgtm-selection-panel'
+  APP_SELECTORS.LGTM_SELECTION_STARTER        = '.js-petit-deco-lgtm-selection-starter'
+  APP_SELECTORS.QUICK_PLUS_ONE_BUTTON         = '.js-petit-deco-quick-plus-one-button'
 
   // define app elements
   const app_elements = {}
 
   // Initialize
-  {
+  const initialize = () => {
     // insert lgtm selection block
     {
       document.body.insertAdjacentHTML('beforeend', `
@@ -45,17 +46,6 @@
       app_elements.$lgtm_images                   = document.querySelectorAll(APP_SELECTORS.LGTM_IMAGES)
     }
 
-    // insert lgtm selection button
-    {
-      github_elements.$nav_above_new_comment_field.insertAdjacentHTML('beforeend', `
-        <span class="btn btn-sm float-right ml-1 `+ APP_SELECTORS.LGTM_SELECTION_STARTER.replace(/\./, '') +`">LGTM</span>
-        <span class="btn btn-sm float-right `+ APP_SELECTORS.QUICK_PLUS_ONE_BUTTON.replace(/\./, '') +`">+1</span>
-      `)
-
-      app_elements.$lgtm_selection_starter = document.querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER)
-      app_elements.$quick_plus_one_button = document.querySelector(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON)
-    }
-
     // fetch lgtm images
     {
       let port = chrome.runtime.connect({name: 'petit-deco-github'})
@@ -75,8 +65,39 @@
     }
   }
 
+  const insertDecos = () => {
+    if (document.querySelector(GITHUB_SELECTORS.CONVERSATION_BUCKET_ID) === null) {
+      return
+    }
+
+    // set github elements
+    {
+      github_elements.$new_comment_field           = document.querySelector(GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID)
+      github_elements.$nav_above_new_comment_field = github_elements.$new_comment_field.closest('form').querySelectorAll('nav').item(0)
+    }
+
+    // remove decos
+    {
+      github_elements.$nav_above_new_comment_field.querySelectorAll(APP_SELECTORS.LGTM_SELECTION_STARTER).forEach(($node) => $node.remove())
+      github_elements.$nav_above_new_comment_field.querySelectorAll(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON).forEach(($node) => $node.remove())
+    }
+
+    // insert decos
+    {
+      github_elements.$nav_above_new_comment_field.insertAdjacentHTML('beforeend', `
+        <span class="btn btn-sm float-right ml-1 `+ APP_SELECTORS.LGTM_SELECTION_STARTER.replace(/\./, '') +`">LGTM</span>
+        <span class="btn btn-sm float-right `+ APP_SELECTORS.QUICK_PLUS_ONE_BUTTON.replace(/\./, '') +`">+1</span>
+      `)
+
+      app_elements.$lgtm_selection_starter = document.querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER)
+      app_elements.$quick_plus_one_button = document.querySelector(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON)
+    }
+
+    setEventListeners()
+  }
+
   // Set Event Listeners
-  {
+  const setEventListeners = () => {
     app_elements.$lgtm_selection_starter.addEventListener('click', (e) => {
       let $self = e.currentTarget
 
@@ -118,4 +139,28 @@
       github_elements.$new_comment_field.value = ':+1:'
     })
   }
+
+  // Observe Mutation
+  {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach(($node) => {
+          setTimeout(() => {
+            if ($node.querySelector(GITHUB_SELECTORS.CONVERSATION_BUCKET_ID) === null) {
+              return
+            }
+
+            insertDecos()
+          }, 500)
+        })
+      })
+    })
+
+    const config = { attributes: true, childList: true, characterData: true }
+
+    observer.observe(github_elements.$pjax_container, config)
+  }
+
+  initialize()
+  insertDecos()
 }
