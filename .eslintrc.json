@@ -2,9 +2,11 @@
   "extends": [ "airbnb" ],
   "globals": {
     "window": true,
-    "document": true
+    "document": true,
+    "chrome": true
   },
   "rules": {
-    "max-len": [1, { "code": 140 }]
+    "max-len": [1, { "code": 140 }],
+    "camelcase": 0
   }
 }
