@@ -3,7 +3,8 @@
   "globals": {
     "window": true,
     "document": true,
-    "chrome": true
+    "chrome": true,
+    "MutationObserver": true
   },
   "rules": {
     "max-len": [1, { "code": 140 }],
