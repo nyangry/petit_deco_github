@@ -147,6 +147,8 @@
 
       app_elements.$quick_plus_one_button.addEventListener('click', () => {
         github_elements.$new_comment_field.value = ':+1:';
+
+        github_elements.$new_comment_field.focus();
       });
     }
   };
