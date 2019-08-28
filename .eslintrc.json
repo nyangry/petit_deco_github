@@ -9,6 +9,8 @@
   "rules": {
     "max-len": [1, { "code": 140 }],
     "camelcase": 0,
-    "no-multi-spaces": [2, { "exceptions": { "VariableDeclarator": true, "ImportDeclaration": true } }]
+    "no-multi-spaces": [2, { "exceptions": { "VariableDeclarator": true, "ImportDeclaration": true } }],
+    "no-lone-blocks": 1,
+    "no-plusplus": 1
   }
 }
