@@ -1,13 +1,13 @@
-var gulp   = require('gulp');
-var concat = require('gulp-concat');
+const gulp   = require('gulp');
+const concat = require('gulp-concat');
 
 // default task
-gulp.task('default', ['dist_js'], function () {
+gulp.task('default', ['dist_js'], () => {
   gulp.watch('src/content_scripts/*.js', ['dist_js']);
 });
 
 // minify and concat content_scripts js
-gulp.task('dist_js', function() {
+gulp.task('dist_js', () => {
   gulp
     .src([
       './src/content_scripts/*.js',
