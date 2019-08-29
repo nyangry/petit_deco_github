@@ -17,6 +17,7 @@ const APP_SELECTORS = {};
 APP_SELECTORS.LGTM_IMAGES = '.js-petit-deco-lgtm-image';
 APP_SELECTORS.LGTM_SELECTION_PANEL_BACKDROP = '.js-petit-deco-lgtm-selection-panel-backdrop';
 APP_SELECTORS.LGTM_SELECTION_PANEL = '.js-petit-deco-lgtm-selection-panel';
+APP_SELECTORS.ACTIONS = '.js-petit-deco-actions';
 APP_SELECTORS.LGTM_SELECTION_STARTER = '.js-petit-deco-lgtm-selection-starter';
 APP_SELECTORS.QUICK_PLUS_ONE_BUTTON = '.js-petit-deco-quick-plus-one-button';
 
@@ -46,15 +47,15 @@ const insertDeco = ($previewable_comment_form_block) => {
     return;
   }
 
-  if ($previewable_comment_form_block.nextElementSibling.querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER) !== null) {
-    return;
+  if ($previewable_comment_form_block.closest('form').querySelector(APP_SELECTORS.ACTIONS) !== null) {
+    $previewable_comment_form_block.closest('form').querySelector(APP_SELECTORS.ACTIONS).remove();
   }
 
   const $comment_field = $previewable_comment_form_block.querySelector(GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS);
   const $form_actions_block = $previewable_comment_form_block.closest('form').querySelector('.form-actions');
 
   $form_actions_block.insertAdjacentHTML('afterbegin', `
-    <div class="float-left mr-2">
+    <div class="js-petit-deco-actions float-left mr-2">
       <span class="btn float-left ${APP_SELECTORS.LGTM_SELECTION_STARTER.replace(/\./, '')}">LGTM</span>
       <span class="btn float-left ml-1 ${APP_SELECTORS.QUICK_PLUS_ONE_BUTTON.replace(/\./, '')}">+1</span>
     </div>
@@ -105,22 +106,38 @@ const insertDeco = ($previewable_comment_form_block) => {
   });
 };
 
-// Observe Mutation
-{
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach(() => {
-        setTimeout(() => {
-          insertDeco();
-        }, 1000);
-      });
+const insertDecos = () => {
+  if (document.getElementById('submit-review') === null) {
+    $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+  } else {
+    $previewable_comment_form_block = document.getElementById('submit-review').querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+  }
+
+  insertDeco($previewable_comment_form_block);
+
+  document.querySelectorAll(GITHUB_SELECTORS.JS_TOGGLE_INLINE_COMMENT_FORM_CLASS).forEach(($js_toggle_inline_comment_form) => {
+    $js_toggle_inline_comment_form.addEventListener('click', (e) => {
+      const $self = e.currentTarget;
+      const $container = $self.closest(GITHUB_SELECTORS.JS_INLINE_COMMENT_FORM_CONTAINER_CLASS);
+
+      insertDeco($container.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
     });
   });
 
-  const config = { attributes: true, childList: true, characterData: true };
+  document.querySelectorAll(GITHUB_SELECTORS.JS_ADD_SINGLE_LINE_COMMENT_CLASS).forEach(($js_add_single_line_comment) => {
+    $js_add_single_line_comment.addEventListener('click', (e) => {
+      const $self = e.currentTarget;
+      const $tr = $self.closest('tr');
 
-  observer.observe(github_elements.$pjax_container, config);
-}
+      // wait sec to add dom
+      setTimeout(() => {
+        const $next_tr = $tr.nextElementSibling;
+
+        insertDeco($next_tr.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
+      }, 200);
+    });
+  });
+};
 
 // Initialize
 const initialize = () => {
@@ -169,37 +186,17 @@ const initialize = () => {
     app_elements.$lgtm_selection_panel_backdrop.style.display = 'none';
     app_elements.$lgtm_selection_panel.style.display = 'none';
   });
-
-  document.querySelectorAll(GITHUB_SELECTORS.JS_TOGGLE_INLINE_COMMENT_FORM_CLASS).forEach(($js_toggle_inline_comment_form) => {
-    $js_toggle_inline_comment_form.addEventListener('click', (e) => {
-      const $self = e.currentTarget;
-      const $container = $self.closest(GITHUB_SELECTORS.JS_INLINE_COMMENT_FORM_CONTAINER_CLASS);
-
-      insertDeco($container.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
-    });
-  });
-
-  document.querySelectorAll(GITHUB_SELECTORS.JS_ADD_SINGLE_LINE_COMMENT_CLASS).forEach(($js_add_single_line_comment) => {
-    $js_add_single_line_comment.addEventListener('click', (e) => {
-      const $self = e.currentTarget;
-      const $tr = $self.closest('tr');
-
-      // wait sec to add dom
-      setTimeout(() => {
-        const $next_tr = $tr.nextElementSibling;
-
-        insertDeco($next_tr.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
-      }, 200);
-    });
-  });
 };
 
 initialize();
 
-if (document.getElementById('submit-review') === null) {
-  $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
-} else {
-  $previewable_comment_form_block = document.getElementById('submit-review').querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
-}
+insertDecos();
 
-insertDeco($previewable_comment_form_block);
+// Observe Mutation
+{
+  const observer = new MutationObserver((mutations) => {
+    insertDecos();
+  });
+
+  observer.observe(github_elements.$pjax_container, { attributes: true, childList: true, characterData: true });
+}
