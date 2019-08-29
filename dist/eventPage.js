@@ -2,13 +2,17 @@ chrome.runtime.onConnect.addListener((port) => {
   port.onMessage.addListener((lgtm_image_index) => {
     const get_json_request = new XMLHttpRequest();
 
-    get_json_request.open('GET', 'https://lgtm.in/g', true);
+    get_json_request.open('GET', 'https://www.lgtm.app/g', true);
+    // get_json_request.open('GET', 'https://lgtm.in/g', true);
     get_json_request.setRequestHeader('Accept', 'application/json');
 
     get_json_request.onload = function () {
       if (get_json_request.status >= 200 && get_json_request.status < 400) {
-        const data             = JSON.parse(get_json_request.responseText);
-        const image_source_url = data.actualImageUrl;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(get_json_request.responseText, 'text/html');
+        const image_source_url = doc.querySelectorAll('.field')[1].querySelector('input').value;
+        // const data             = JSON.parse(get_json_request.responseText);
+        // const image_source_url = data.actualImageUrl;
         const markdown         = `![](${image_source_url})`;
         const image            = new Image();
         let base64_image     = null;
