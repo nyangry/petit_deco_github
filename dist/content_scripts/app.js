@@ -2,8 +2,12 @@
   // define github selectors
   const GITHUB_SELECTORS = {};
   GITHUB_SELECTORS.PJAX_CONTAINER_ID = '#js-repo-pjax-container';
-  GITHUB_SELECTORS.CONVERSATION_BUCKET_ID = '#discussion_bucket';
-  GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID = '#new_comment_field';
+  GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS = '.js-new-comment-form';
+  GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS = '.js-previewable-comment-form';
+  GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS = '.js-comment-field';
+  GITHUB_SELECTORS.JS_TOGGLE_INLINE_COMMENT_FORM_CLASS = '.js-toggle-inline-comment-form';
+  GITHUB_SELECTORS.JS_INLINE_COMMENT_FORM_CONTAINER_CLASS = '.js-inline-comment-form-container';
+  GITHUB_SELECTORS.JS_ADD_SINGLE_LINE_COMMENT_CLASS = '.js-add-single-line-comment';
 
   // define github elements
   const github_elements = {};
@@ -19,54 +23,6 @@
 
   // define app elements
   const app_elements = {};
-
-  // Initialize
-  const initialize = () => {
-    // insert lgtm selection block
-    {
-      document.body.insertAdjacentHTML('beforeend', `
-        <div class="js-petit-deco-lgtm-selection-panel-backdrop petit-deco-lgtm-selection-backdrop"></div>
-
-        <div class="js-petit-deco-lgtm-selection-panel petit-deco-lgtm-selection-panel">
-          <div class="petit-deco-lgtm-selection-flex-container">
-            <img class="js-petit-deco-lgtm-image">
-            <img class="js-petit-deco-lgtm-image">
-            <img class="js-petit-deco-lgtm-image">
-            <img class="js-petit-deco-lgtm-image">
-            <img class="js-petit-deco-lgtm-image">
-            <img class="js-petit-deco-lgtm-image">
-          </div>
-
-          <div class="petit-deco-lgtm-selection-panel-triangle"></div>
-        </div>
-      `);
-
-      app_elements.$lgtm_selection_panel_backdrop = document.querySelector(APP_SELECTORS.LGTM_SELECTION_PANEL_BACKDROP);
-      app_elements.$lgtm_selection_panel = document.querySelector(APP_SELECTORS.LGTM_SELECTION_PANEL);
-      app_elements.$lgtm_images = document.querySelectorAll(APP_SELECTORS.LGTM_IMAGES);
-    }
-
-    // Set Event Listeners
-    {
-      app_elements.$lgtm_images.forEach(($lgtm_image) => {
-        $lgtm_image.addEventListener('click', (e) => {
-          const $self = e.currentTarget;
-
-          github_elements.$new_comment_field.value = `${github_elements.$new_comment_field.value}\n${$self.dataset.markdown}`;
-
-          app_elements.$lgtm_selection_panel_backdrop.style.display = 'none';
-          app_elements.$lgtm_selection_panel.style.display = 'none';
-
-          github_elements.$new_comment_field.focus();
-        });
-      });
-
-      app_elements.$lgtm_selection_panel_backdrop.addEventListener('click', () => {
-        app_elements.$lgtm_selection_panel_backdrop.style.display = 'none';
-        app_elements.$lgtm_selection_panel.style.display = 'none';
-      });
-    }
-  };
 
   // fetch lgtm images
   const fetchLgtmImages = () => {
@@ -86,84 +42,77 @@
     }
   };
 
-  const insertDecos = () => {
-    if (document.querySelector(GITHUB_SELECTORS.CONVERSATION_BUCKET_ID) === null) {
+  const insertDeco = ($previewable_comment_form_block) => {
+    if ($previewable_comment_form_block === null) {
       return;
     }
 
-    // set github elements
-    {
-      github_elements.$new_comment_field = document.querySelector(GITHUB_SELECTORS.NEW_COMMENT_FIELD_ID);
-      github_elements.$nav_above_new_comment_field = github_elements.$new_comment_field.closest('form').querySelectorAll('nav').item(0);
+    if ($previewable_comment_form_block.nextElementSibling.querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER) !== null) {
+      return;
     }
 
-    // remove decos
-    {
-      github_elements.$nav_above_new_comment_field.querySelectorAll(APP_SELECTORS.LGTM_SELECTION_STARTER).forEach($node => $node.remove());
-      github_elements.$nav_above_new_comment_field.querySelectorAll(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON).forEach($node => $node.remove());
-    }
+    const $comment_field = $previewable_comment_form_block.querySelector(GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS);
+    const $form_actions_block = $previewable_comment_form_block.closest('form').querySelector('.form-actions');
 
-    // insert decos
-    {
-      github_elements.$nav_above_new_comment_field.insertAdjacentHTML('beforeend', `
-        <span class="btn btn-sm float-right ml-1 ${APP_SELECTORS.LGTM_SELECTION_STARTER.replace(/\./, '')}">LGTM</span>
-        <span class="btn btn-sm float-right ${APP_SELECTORS.QUICK_PLUS_ONE_BUTTON.replace(/\./, '')}">+1</span>
-      `);
+    $form_actions_block.insertAdjacentHTML('afterbegin', `
+      <div class="float-left mr-2">
+        <span class="btn float-left ${APP_SELECTORS.LGTM_SELECTION_STARTER.replace(/\./, '')}">LGTM</span>
+        <span class="btn float-left ml-1 ${APP_SELECTORS.QUICK_PLUS_ONE_BUTTON.replace(/\./, '')}">+1</span>
+      </div>
+    `);
+    $form_actions_block.style.float = 'none';
 
-      app_elements.$lgtm_selection_starter = document.querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER);
-      app_elements.$quick_plus_one_button = document.querySelector(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON);
-    }
+    const $lgtm_selection_starter = $previewable_comment_form_block.closest('form').querySelector(APP_SELECTORS.LGTM_SELECTION_STARTER);
+    const $quick_plus_one_button = $previewable_comment_form_block.closest('form').querySelector(APP_SELECTORS.QUICK_PLUS_ONE_BUTTON);
 
     // Set Event Listeners
-    {
-      app_elements.$lgtm_selection_starter.addEventListener('click', (e) => {
-        // refetch lgtm images
-        {
-          app_elements.$lgtm_images.forEach(($img) => {
-            $img.setAttribute('alt', '');
-            $img.removeAttribute('src');
-          });
+    $lgtm_selection_starter.addEventListener('click', (e) => {
+      const $self = e.currentTarget;
 
-          fetchLgtmImages();
-        }
-
-        const $self = e.currentTarget;
-
-        const scroll_top = window.pageYOffset || document.documentElement.scrollTop;
-        const scroll_left = window.pageXOffset || document.documentElement.scrollLeft;
-
-        const self_rect = $self.getBoundingClientRect();
-        const new_comment_field_rect = github_elements.$new_comment_field.getBoundingClientRect();
-
-        const self_top = self_rect.top + scroll_top;
-        const new_comment_field_left = new_comment_field_rect.left + scroll_left;
-
-        app_elements.$lgtm_selection_panel.style.top = `${self_top - 245}px`;
-        app_elements.$lgtm_selection_panel.style.left = `${new_comment_field_left + 170}px`;
-
-        app_elements.$lgtm_selection_panel_backdrop.style.display = 'block';
-        app_elements.$lgtm_selection_panel.style.display = 'block';
+      // refetch lgtm images
+      app_elements.$lgtm_images.forEach(($img) => {
+        $img.setAttribute('alt', '');
+        $img.removeAttribute('src');
       });
 
-      app_elements.$quick_plus_one_button.addEventListener('click', () => {
-        github_elements.$new_comment_field.value = ':+1:';
+      fetchLgtmImages();
 
-        github_elements.$new_comment_field.focus();
-      });
-    }
+      // set current event button
+      app_elements.$target_event_button = $self;
+
+      // set position
+      const scroll_top = window.pageYOffset || document.documentElement.scrollTop;
+      const scroll_left = window.pageXOffset || document.documentElement.scrollLeft;
+
+      const self_rect = $self.getBoundingClientRect();
+
+      const self_top = self_rect.top + scroll_top;
+      const self_left = self_rect.left + scroll_left;
+
+      app_elements.$lgtm_selection_panel.style.top = `${self_top - 243}px`;
+      app_elements.$lgtm_selection_panel.style.left = `${self_left - 70}px`;
+
+      app_elements.$lgtm_selection_panel_backdrop.style.display = 'block';
+      app_elements.$lgtm_selection_panel.style.display = 'block';
+    });
+
+    $quick_plus_one_button.addEventListener('click', () => {
+      $comment_field.focus();
+
+      $comment_field.value = ':+1:';
+
+      // send input event to toggle comment button enabled
+      $comment_field.dispatchEvent(new Event('input'));
+    });
   };
 
   // Observe Mutation
   {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach(($node) => {
+        mutation.addedNodes.forEach(() => {
           setTimeout(() => {
-            if ($node.querySelector(GITHUB_SELECTORS.CONVERSATION_BUCKET_ID) === null) {
-              return;
-            }
-
-            insertDecos();
+            insertDeco();
           }, 1000);
         });
       });
@@ -174,6 +123,83 @@
     observer.observe(github_elements.$pjax_container, config);
   }
 
+  // Initialize
+  const initialize = () => {
+    // insert lgtm selection block
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="js-petit-deco-lgtm-selection-panel-backdrop petit-deco-lgtm-selection-backdrop"></div>
+
+      <div class="js-petit-deco-lgtm-selection-panel petit-deco-lgtm-selection-panel">
+        <div class="petit-deco-lgtm-selection-flex-container">
+          <img class="js-petit-deco-lgtm-image">
+          <img class="js-petit-deco-lgtm-image">
+          <img class="js-petit-deco-lgtm-image">
+          <img class="js-petit-deco-lgtm-image">
+          <img class="js-petit-deco-lgtm-image">
+          <img class="js-petit-deco-lgtm-image">
+        </div>
+
+        <div class="petit-deco-lgtm-selection-panel-triangle"></div>
+      </div>
+    `);
+
+    app_elements.$lgtm_selection_panel_backdrop = document.querySelector(APP_SELECTORS.LGTM_SELECTION_PANEL_BACKDROP);
+    app_elements.$lgtm_selection_panel = document.querySelector(APP_SELECTORS.LGTM_SELECTION_PANEL);
+    app_elements.$lgtm_images = document.querySelectorAll(APP_SELECTORS.LGTM_IMAGES);
+
+    // Set Event Listeners
+    app_elements.$lgtm_images.forEach(($lgtm_image) => {
+      $lgtm_image.addEventListener('click', (e) => {
+        const $self = e.currentTarget;
+        const $form = app_elements.$target_event_button.closest('form');
+        const $comment_field = $form.querySelector(GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS);
+
+        app_elements.$lgtm_selection_panel_backdrop.style.display = 'none';
+        app_elements.$lgtm_selection_panel.style.display = 'none';
+
+        $comment_field.focus();
+
+        $comment_field.value = `${$comment_field.value}\n${$self.dataset.markdown}`;
+
+        // send input event to toggle comment button enabled
+        $comment_field.dispatchEvent(new Event('input'));
+      });
+    });
+
+    app_elements.$lgtm_selection_panel_backdrop.addEventListener('click', () => {
+      app_elements.$lgtm_selection_panel_backdrop.style.display = 'none';
+      app_elements.$lgtm_selection_panel.style.display = 'none';
+    });
+
+    document.querySelectorAll(GITHUB_SELECTORS.JS_TOGGLE_INLINE_COMMENT_FORM_CLASS).forEach(($js_toggle_inline_comment_form) => {
+      $js_toggle_inline_comment_form.addEventListener('click', (e) => {
+        const $self = e.currentTarget;
+        const $container = $self.closest(GITHUB_SELECTORS.JS_INLINE_COMMENT_FORM_CONTAINER_CLASS);
+
+        insertDeco($container.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
+      });
+    });
+
+    document.querySelectorAll(GITHUB_SELECTORS.JS_ADD_SINGLE_LINE_COMMENT_CLASS).forEach(($js_add_single_line_comment) => {
+      $js_add_single_line_comment.addEventListener('click', (e) => {
+        const $self = e.currentTarget;
+        const $tr = $self.closest('tr');
+
+        // wait sec to add dom
+        setTimeout(() => {
+          const $next_tr = $tr.nextElementSibling;
+
+          insertDeco($next_tr.querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS));
+        }, 200);
+      });
+    });
+  };
+
   initialize();
-  insertDecos();
+  if (document.getElementById('submit-review') === null) {
+    $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+  } else {
+    $previewable_comment_form_block = document.getElementById('submit-review').querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+  }
+  insertDeco($previewable_comment_form_block);
 }
