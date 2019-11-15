@@ -35,7 +35,8 @@
     "permissions": [
       "background",
       "https://*/",
-      "http://*/"
+      "http://*/",
+      "activeTab"
     ],
 
     "web_accessible_resources": [
