@@ -2,8 +2,8 @@ chrome.runtime.onConnect.addListener((port) => {
   port.onMessage.addListener((lgtm_image_index) => {
     const get_json_request = new XMLHttpRequest();
 
-    get_json_request.open('GET', 'https://www.lgtm.app/g', true);
-    // get_json_request.open('GET', 'https://lgtm.in/g', true);
+    // get_json_request.open('GET', 'https://www.lgtm.app/g', true);
+    get_json_request.open('GET', 'https://lgtm.in/g', true);
     get_json_request.setRequestHeader('Accept', 'application/json');
 
     get_json_request.onload = function () {
