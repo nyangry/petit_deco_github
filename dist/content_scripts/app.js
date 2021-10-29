@@ -2,6 +2,7 @@
 const GITHUB_SELECTORS = {};
 GITHUB_SELECTORS.PJAX_CONTAINER_ID = '#repo-content-pjax-container';
 GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS = '.js-new-comment-form';
+GITHUB_SELECTORS.JS_REVIEWS_CONTAINER_CLASS = '.js-reviews-container';
 GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS = '.js-previewable-comment-form';
 GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS = '.js-comment-field';
 GITHUB_SELECTORS.JS_TOGGLE_INLINE_COMMENT_FORM_CLASS = '.js-toggle-inline-comment-form';
@@ -107,10 +108,10 @@ const insertDeco = ($previewable_comment_form_block) => {
 };
 
 const insertDecos = () => {
-  if (document.getElementById('submit-review') === null) {
-    $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+  if (!!document.querySelector(GITHUB_SELECTORS.JS_REVIEWS_CONTAINER_CLASS)) {
+    $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_REVIEWS_CONTAINER_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
   } else {
-    $previewable_comment_form_block = document.getElementById('submit-review').querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
+    $previewable_comment_form_block = document.querySelector(GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS).querySelector(GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS)
   }
 
   insertDeco($previewable_comment_form_block);
