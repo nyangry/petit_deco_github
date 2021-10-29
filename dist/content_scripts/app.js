@@ -1,6 +1,6 @@
 // define github selectors
 const GITHUB_SELECTORS = {};
-GITHUB_SELECTORS.PJAX_CONTAINER_ID = '#js-repo-pjax-container';
+GITHUB_SELECTORS.PJAX_CONTAINER_ID = '#repo-content-pjax-container';
 GITHUB_SELECTORS.JS_NEW_COMMENT_FORM_CLASS = '.js-new-comment-form';
 GITHUB_SELECTORS.JS_PREVIEWABLE_COMMENT_FORM_BLOCK_CLASS = '.js-previewable-comment-form';
 GITHUB_SELECTORS.JS_COMMENT_FIELD_CLASS = '.js-comment-field';
